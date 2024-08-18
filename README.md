@@ -1,5 +1,5 @@
 # Indyread
-Server for replicating ledger transactions from a Hyperledger Indy Node ledger instance
+Read Replica for the Hyperledger Indy Ledger.
 
 Read replicas, in context of Hyperledger Indy, are copies of ledger transactions that are kept synchro-
 nized with the original Indy ledger. They are designed to offload read traffic from the main ledger,
