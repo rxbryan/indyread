@@ -1,0 +1,42 @@
+{
+  "name": "indyscan-api",
+   "version": "0.5.1",
+  "author": "Bryan Elee",
+  "license": "ISC",
+  "description": "Read Replica for the Hyperledger Indy blockchain.",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "dev": "nodemon src/index.js",
+    "dev:sovrin:builder": "nodemon --config nodemon-buildernet.json src/index.js",
+    "test:unit": "jest tests/unit",
+    "start": "cross-env NODE_ENV=production node src/index.js"
+  },
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.4.0",
+    "body-parser": "^1.19.0",
+    "cross-env": "^5.2.1",
+    "dotenv": "^7.0.0",
+    "express": "^4.17.1",
+    "express-prettify": "^0.1.1",
+    "express-validation": "^1.0.2",
+    "fs-extra": "^4.0.3",
+    "indyscan-storage": "file:../packages/indyscan-storage",
+    "joi": "^14.3.1",
+    "lodash": "^4.17.21",
+    "uuid": "^3.4.0",
+    "winston": "^3.3.3",
+    "write": "^1.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^8.0.58",
+    "express-swagger-generator": "^1.1.17",
+    "@types/jest": "^26.0.23",
+    "jest": "^27.0.6",
+    "jest-cli": "^27.0.6",
+    "nodemon": "^1.19.4",
+    "rimraf": "^2.7.1",
+    "standard": "^14.3.4"
+  }
+}

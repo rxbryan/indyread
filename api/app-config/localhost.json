@@ -1,0 +1,10 @@
+[
+  {
+    "id": "HOST_DOCKER_INTERNAL",
+    "display": "IndyNetwork",
+    "es" : {
+      "index": "txs-localhost"
+    },
+    "description": "MainNet is live network for production use."
+  }
+]

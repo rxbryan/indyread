@@ -1,0 +1,6 @@
+dump/
+storage-unittests/
+logs/
+node-modules/
+*/node_modules/
+

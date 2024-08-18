@@ -1,0 +1,19 @@
+{
+  "name": "indyscan-txtype",
+  "version": "4.6.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "lint": "standard",
+    "lint:fix": "standard --fix",
+    "test:unit": "jest test/unit"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.23",
+    "jest": "^27.0.6",
+    "jest-cli": "^27.0.6",
+    "standard": "^14.3.4"
+  },
+  "author": "Patrik Staš",
+  "license": "ISC"
+}
