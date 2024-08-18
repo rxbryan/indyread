@@ -62,6 +62,16 @@ function initTxsApi (app, networkManager, serviceTxs) {
       const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo), format)
       res.status(200).send(tx)
     }))
+    
+  app.get('/api/networks/:networkRef/ledgers/:ledger/txs/:seqNo/raw',
+    asyncHandler(async function (req, res) {
+      const { ledger: subledger, seqNo } = req.params
+      let { format } = req.query
+      format = format || 'serialized'
+      const networkId = getNetworkId(req, res)
+      const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo), format)
+      res.status(200).send(JSON.parse(tx.idata.json))
+    }))
 
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
     validate(
