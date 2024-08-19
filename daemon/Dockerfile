@@ -17,40 +17,41 @@ USER node
 USER root
 ARG UID=1002
 ARG GID=1002
-RUN addgroup -g $GID indyscan && adduser -u $UID -D -G indyscan indyscan
+RUN addgroup -g $GID indyread && adduser -u $UID -D -G indyread indyread
 
-WORKDIR /home/indyscan/indyscan-txtype
-WORKDIR /home/indyscan/indyscan-storage
-WORKDIR /home/indyscan/indyscan-daemon
-RUN chown -R indyscan:indyscan /home/indyscan
+WORKDIR /home/indyread/packages/indyscan-txtype
+WORKDIR /home/indyread/packages/indyscan-storage
+WORKDIR /home/indyread/daemon
+RUN chown -R indyread:indyread /home/indyread
 
-USER indyscan
+USER indyread
 
-WORKDIR /home/indyscan/indyscan-txtype
-COPY --chown=indyscan:indyscan indyscan-txtype ./
+WORKDIR /home/indyread/packages/indyscan-txtype
+COPY --chown=indyread:indyread packages/indyscan-txtype ./
 RUN npm ci --only=prod
 
-WORKDIR /home/indyscan/indyscan-storage
-COPY --chown=indyscan:indyscan indyscan-storage ./
+WORKDIR /home/indyread/packages/indyscan-storage
+COPY --chown=indyread:indyread packages/indyscan-storage ./
 RUN npm ci --only=prod
 
-WORKDIR /home/indyscan/indyscan-daemon
-COPY --chown=indyscan:indyscan indyscan-daemon/package*.json ./
+WORKDIR /home/indyread/daemon
+COPY --chown=indyread:indyread daemon/package*.json ./
+COPY --chown=indyread:indyread ./daemon ./
+RUN rm -rf /node_modules
 RUN npm ci --only=prod
-COPY --chown=indyscan:indyscan indyscan-daemon ./
 
 USER root
-RUN chown -R indyscan:indyscan /home/indyscan
-USER indyscan
-RUN mkdir -p /home/indyscan/indyscan-daemon/logs
-RUN mkdir -p /home/indyscan/.indy_client/wallet
-RUN mkdir -p /home/indyscan/.indy_client/pool
+RUN chown -R indyread:indyread /home/indyread
+USER indyread
+RUN mkdir -p /home/indyread/daemon/logs
+RUN mkdir -p /home/indyread/.indy_client/wallet
+RUN mkdir -p /home/indyread/.indy_client/pool
 
 LABEL org.label-schema.schema-version="1.1.0"
-LABEL org.label-schema.name="indyscan-daemon"
+LABEL org.label-schema.name="indyread-daemon"
 LABEL org.label-schema.description="Application scanning Hyperledger Indy blockchain for new transactions and further processing."
-LABEL org.label-schema.vcs-url="https://github.com/Patrik-Stas/indyscan"
+LABEL org.label-schema.vcs-url="https://github.com/rxbryan/indyread"
 
-WORKDIR /home/indyscan/indyscan-daemon
+WORKDIR /home/indyread/daemon
 
 CMD npm run start
