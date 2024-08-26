@@ -1,7 +1,7 @@
 const { esFilterContainsFormat } = require('./es-query-builder')
 const { SUBLEDGERS } = require('./consts')
 const { searchOneDocument } = require('./utils')
-const { esFilterSubledgerName, esAndFilters, esFilterBySeqNo } = require('./es-query-builder')
+const { esFilterSubledgerName, esAndFilters, esFilterBySeqNo, esFilterByNYM } = require('./es-query-builder')
 const util = require('util')
 
 function createWinstonLoggerDummy () {
@@ -70,6 +70,19 @@ function createStorageReadEs (esClient, esIndex) {
     return tx.idata[format]
   }
 
+  async function getNYMTx (subledger, nym, format = 'full') {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = esAndFilters(subledgerTxsQuery, esFilterByNYM(nym))
+    const tx = await searchOneDocument(esClient, esIndex, query)
+    if (!tx) {
+      return undefined
+    }
+    if (format === 'full') {
+      return tx
+    }
+    return tx.idata[format]
+  }
+
   async function executeEsSearch (searchRequest, logger = createWinstonLoggerDummy()) {
     try {
       logger.debug(`${whoami} Submitting ES request ${JSON.stringify(searchRequest, null, 2)}`)
@@ -127,6 +140,7 @@ function createStorageReadEs (esClient, esIndex) {
   return {
     findMaxSeqNo,
     getOneTx,
+    getNYMTx,
     getManyTxs,
     getTxCount
   }

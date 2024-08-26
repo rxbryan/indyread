@@ -12,21 +12,12 @@ include:
 ledger.
 - Enables faster resolution of read transactions for agents.
 
-## Run IndyRead on Sovrin Netork
-first startup an elasticsearch image by running: 
-```
-make es-up
-```
-start up the daemon:
-```
-cd daemon &&  npm run start
-```
-start up the rest server:
-```
-cd api && ES_URL=http://localhost:9200 DAEMON_URL=http://localhost:3709 LOG_LEVEL=info PORT=3708 NETWORKS_CONFIG_PATH=./app-config/sovrin-buildernet.json LOG_HTTP_REQUESTS=true LOG_HTTP_RESPONSES=true npm run start
-```
+### Usage
+You can find out how to Setup indyread for local tests [here](docs/setup_local_test_network.md)
 
-This will start up
-- indyread services (scanner, api, elasticsearch)
-- by default also kibana, you can opt-out by commenting it out in the `docker-compose` file
- 
+### API
+Provides replica clients with an HTTP version of the existing ledger API for querying and retrieving relevant identity data from the replicas. [Read more](docs/API.md).
+
+###  Daemon
+Scans ledger and stores the found transactions in an elasticsearch database.
+

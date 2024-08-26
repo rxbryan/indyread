@@ -8,6 +8,14 @@ function esFilterByTxTypeNames (txNames) {
   }
 }
 
+function esFilterByNYM (nym) {
+  return {
+    term: {
+      'idata.expansion.idata.txn.data.dest': nym
+    }
+  }
+}
+
 function esFilterSubledgerName (subledgerName) {
   return {
     term: {
@@ -122,6 +130,7 @@ function esAndFilters (...filters) {
 
 module.exports.esFilterSubledgerName = esFilterSubledgerName
 module.exports.esFilterByTxTypeNames = esFilterByTxTypeNames
+module.exports.esFilterByNYM = esFilterByNYM
 module.exports.esFilterTxnAfterTime = esFilterTxnAfterTime
 module.exports.esFilterTxnBeforeTime = esFilterTxnBeforeTime
 module.exports.esFilterBySeqNo = esFilterBySeqNo
