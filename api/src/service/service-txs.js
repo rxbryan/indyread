@@ -37,9 +37,10 @@ function createServiceTxs (ledgerStorageManager) {
       .getManyTxs(subledger, skip, size, [txTypeQuery, txSeqnoQuery, searchQuery], sort, format)
   }
 
-  async function getTx (networkId, subledger, seqNo, format) {
+  async function getTx (networkId, subledger, query, format) {
     const storage = await ledgerStorageManager.getStorage(networkId)
-    return storage.getOneTx(subledger, seqNo, format)
+    
+    return query.seqNo ? storage.getOneTx(subledger, query.seqNo, format) : query.nym ? storage.getNYMTx(subledger, query.nym, format) : {}
   }
 
   async function getTxsCount (networkId, subledger, filterTxNames, search) {
