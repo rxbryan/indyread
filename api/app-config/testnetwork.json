@@ -3,18 +3,18 @@
     "id": "TEST_NETWORK",
     "ui": {
       "priority": 1,
-      "display": "von",
-      "display-long": "von localhost",
+      "display": "",
+      "display-long": "",
       "description": "For active development of indyread.",
       "tutorial": "Get your DID and start writing on the network",
       "tutorial-link": "",
       "logo-address": ""
     },
     "aliases": [
-      "von-localhost"
+      ""
     ],
     "es" : {
-      "index": "txs-von"
+      "index": "txs-bcovdev"
     }
   }
 ]
