@@ -52,7 +52,11 @@ async function startServer () {
   initApiNetworks(app, networkConfigManager)
 
   app.use(function (err, req, res, next) {
-    res.status(400).json(err)
+    res.status(err.status || 400).json({
+      message: err.message,
+      code: err.code,
+      details: err.details
+    })
   })
 
   app.use(function (req, res, next) {

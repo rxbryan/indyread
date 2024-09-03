@@ -23,16 +23,16 @@ const appConfig = {
 
 logger.info(`Loaded configuration:\n${JSON.stringify(appConfig, null, 2)}`)
 
-const configValidation = Joi.object().keys({
+const configValidation = Joi.object({
   PORT: Joi.number().integer().min(1025).max(65535).required(),
   NETWORKS_CONFIG_PATH: Joi.string().required(),
   ES_URL: Joi.string().uri().required(),
-  LOG_LEVEL: Joi.string().valid(['trace', 'debug', 'info', 'warn', 'error']).required(),
-  LOG_HTTP_REQUESTS: Joi.string().valid(['true', 'false']).required(),
-  LOG_HTTP_RESPONSES: Joi.string().valid(['true', 'false']).required()
+  LOG_LEVEL: Joi.string().valid('trace', 'debug', 'info', 'warn', 'error').required(),
+  LOG_HTTP_REQUESTS: Joi.string().valid('true', 'false').required(),
+  LOG_HTTP_RESPONSES: Joi.string().valid('true', 'false').required()
 })
 console.log(appConfig)
-Joi.validate(appConfig, configValidation, (err, ok) => { if (err) throw err })
+configValidation.validate(appConfig, (err, ok) => { if (err) throw err })
 
 if (!fs.existsSync(appConfig.NETWORKS_CONFIG_PATH)) {
   throw Error(`Config path ${appConfig.NETWORKS_CONFIG_PATH} is not pointing to a file.`)
