@@ -8,10 +8,42 @@ function esFilterByTxTypeNames (txNames) {
   }
 }
 
+function esMatchTxType (txType) {
+  return {
+    match: {
+      'idata.expansion.idata.txn.typeName': txType
+    }
+  }
+}
+
 function esFilterByNYM (nym) {
   return {
-    term: {
+    match: {
       'idata.expansion.idata.txn.data.dest': nym
+
+    }
+  }
+}
+
+function esFilterByAttribName (name) {
+  return {
+    match: {
+      'idata.expansion.idata.txn.data.raw': {
+        'query': name,
+        'analyzer': 'standard'
+      }
+
+    }
+  }
+}
+
+function esMatchTxTime(utime) {
+  return {
+    "match": {
+      "idata.expansion.idata.txnMetadata.txnTime": {
+        "query": new Date(utime * 1000).toISOString(),
+        "analyzer": "keyword"
+      }
     }
   }
 }
@@ -130,7 +162,10 @@ function esAndFilters (...filters) {
 
 module.exports.esFilterSubledgerName = esFilterSubledgerName
 module.exports.esFilterByTxTypeNames = esFilterByTxTypeNames
+module.exports.esMatchTxType = esMatchTxType
 module.exports.esFilterByNYM = esFilterByNYM
+module.exports.esFilterByAttribName = esFilterByAttribName
+module.exports.esMatchTxTime = esMatchTxTime
 module.exports.esFilterTxnAfterTime = esFilterTxnAfterTime
 module.exports.esFilterTxnBeforeTime = esFilterTxnBeforeTime
 module.exports.esFilterBySeqNo = esFilterBySeqNo
