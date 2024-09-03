@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@elastic/elasticsearch": "^7.17.14",
+    "indyscan-storage": "file:../packages/indyscan-storage"
+  }
+}
