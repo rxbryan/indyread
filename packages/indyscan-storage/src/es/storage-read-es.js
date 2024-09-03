@@ -1,7 +1,15 @@
-const { esFilterContainsFormat } = require('./es-query-builder')
+const { esFilterContainsFormat, esOrFilters } = require('./es-query-builder')
 const { SUBLEDGERS } = require('./consts')
 const { searchOneDocument } = require('./utils')
-const { esFilterSubledgerName, esAndFilters, esFilterBySeqNo, esFilterByNYM } = require('./es-query-builder')
+const {
+  esFilterSubledgerName,
+  esAndFilters, 
+  esFilterBySeqNo, 
+  esFilterByNYM, 
+  esMatchTxType, 
+  esMatchTxTime,
+  esFilterByAttribName
+} = require('./es-query-builder')
 const util = require('util')
 
 function createWinstonLoggerDummy () {
@@ -60,19 +68,8 @@ function createStorageReadEs (esClient, esIndex) {
   async function getOneTx (subledger, seqNo, format = 'full') {
     const subledgerTxsQuery = createSubledgerQuery(subledger)
     const query = esAndFilters(subledgerTxsQuery, esFilterBySeqNo(seqNo))
-    const tx = await searchOneDocument(esClient, esIndex, query)
-    if (!tx) {
-      return undefined
-    }
-    if (format === 'full') {
-      return tx
-    }
-    return tx.idata[format]
-  }
-
-  async function getNYMTx (subledger, nym, format = 'full') {
-    const subledgerTxsQuery = createSubledgerQuery(subledger)
-    const query = esAndFilters(subledgerTxsQuery, esFilterByNYM(nym))
+    console.log(JSON.stringify(query))
+    //console.log(seqNo)
     const tx = await searchOneDocument(esClient, esIndex, query)
     if (!tx) {
       return undefined
@@ -93,6 +90,52 @@ function createStorageReadEs (esClient, esIndex) {
       logger.error(util.inspect(e, undefined, 10))
       throw e
     }
+  }
+
+  async function getNYM (subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = queries.timestamp
+    ? esAndFilters(subledgerTxsQuery, esMatchTxType("NYM"), esFilterByNYM(queries.nym), esMatchTxTime(queries.timestamp))
+    : queries.seqNo
+    ? esAndFilters(subledgerTxsQuery, esMatchTxType("NYM"), esFilterByNYM(queries.nym), esFilterBySeqNo(queries.seqNo))
+    : esAndFilters(subledgerTxsQuery, esMatchTxType("NYM"), esFilterByNYM(queries.nym))
+
+    let sort = { 'imeta.seqNo': { order: 'asc' } }
+
+    const searchRequest = {
+      index: esIndex,
+      body: { query, sort }
+    }
+
+    console.log(JSON.stringify(query))
+    const body = await executeEsSearch(searchRequest)
+    const fullTxs = body.hits.hits.map(h => h._source)
+    //console.log(JSON.stringify(fullTxs))
+    return fullTxs
+  }
+
+  async function getAttrib (subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = queries.raw 
+    ? esAndFilters(subledgerTxsQuery, esMatchTxType("ATTRIB"), esFilterByNYM(queries.nym), esFilterByAttribName(queries.raw))
+    : queries.timestamp
+    ? esAndFilters(subledgerTxsQuery, esMatchTxType("ATTRIB"), esFilterByNYM(queries.nym), esMatchTxTime(queries.timestamp))
+    : queries.seqNo
+    ? esAndFilters(subledgerTxsQuery, esMatchTxType("ATTRIB"), esFilterByNYM(queries.nym), esFilterBySeqNo(queries.seqNo))
+    : esAndFilters(subledgerTxsQuery, esMatchTxType("ATTRIB"), esFilterByNYM(queries.nym))
+
+    let sort = { 'imeta.seqNo': { order: 'asc' } }
+
+    const searchRequest = {
+      index: esIndex,
+      body: { query, sort }
+    }
+
+    console.log(JSON.stringify(query))
+    const body = await executeEsSearch(searchRequest)
+    const fullTxs = body.hits.hits.map(h => h._source)
+    //console.log(JSON.stringify(fullTxs))
+    return fullTxs
   }
 
   /*
@@ -140,7 +183,8 @@ function createStorageReadEs (esClient, esIndex) {
   return {
     findMaxSeqNo,
     getOneTx,
-    getNYMTx,
+    getNYM,
+    getAttrib,
     getManyTxs,
     getTxCount
   }
