@@ -88,12 +88,12 @@ This API provides endpoints for querying the indy ledger.
                 }
             ```
 
-* **GET /api/networks/:networkRef/ledgers/:ledger/txs/nym/:nym**
+* **GET /api/networks/:networkRef/ledgers/:ledger/txs/nym/:dest**
     * **Description:** searches the ledger for a nym/did transaction.
     * **Request Parameters:**
         * `networkRef`: network id.
         * `ledger`: `domain` `pool` `config`.
-        * `nym`: nym to search for.
+        * `dest`: nym to search for.
     * **Request query:**
         * `timestamp`: timestamp' is mutually exclusive with 'seqNo'
         * `seqNo`: transaction id. seqNo' is mutually exclusive with 'timestamp'
@@ -171,7 +171,7 @@ This API provides endpoints for querying the indy ledger.
     * **Request Parameters:**
         * `networkRef`: network id.
         * `ledger`: `domain` `pool` `config`.
-        * `nym`: nym to search for.
+        * `dest`: nym to search for.
     * **Request query:**
         * `timestamp`: timestamp' is mutually exclusive with 'seqNo'.
         * `seqNo`: transaction id. seqNo' is mutually exclusive with 'timestamp'.
