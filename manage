@@ -1,0 +1,65 @@
+#!/bin/bash
+
+# =================================================================================================================
+# Usage:
+# -----------------------------------------------------------------------------------------------------------------
+usage () {
+  cat <<-EOF
+
+  Usage: $0 [command]
+
+  Commands:
+
+  build - Build the docker images for the project.
+          You need to do this first.
+
+  start - Setup test environment for development
+       This command would startup an elasticsearch container, and import transactions into
+       es from a json file.
+
+  logs - To tail the logs of running containers (ctrl-c to exit).
+
+  down | rm - Brings down the services and removes the volumes (storage) and containers.
+
+  stop - Stops the services.  This is a non-destructive process.  The volumes and containers
+         are not deleted so they will be reused the next time you run start.
+
+  rebuild - Rebuild the docker images.
+
+EOF
+exit 1
+}
+
+function toLower() {
+  echo $(echo ${@} | tr '[:upper:]' '[:lower:]')
+}
+
+COMMAND=$(toLower ${1})
+
+case "${COMMAND}" in
+  start)
+      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml up -d
+      echo "Waiting for elasticsearch..."
+      sleep 15
+      node "start_test/import_esindex.js"
+      echo 'Want to see the scrolling container logs? Run "./manage logs"'
+    ;;
+  logs)
+      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml logs -f
+    ;;
+  stop)
+      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml down
+    ;;
+  down|rm)
+      docker compose  -f docker-compose.es.yml -f start_test/docker-compose.dev.yml down --remove-orphans --volumes 
+    ;;
+  build)
+      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml build
+    ;;
+  rebuild)
+      echo "Not implemented"
+    ;;
+  *)
+      usage;;
+esac
+

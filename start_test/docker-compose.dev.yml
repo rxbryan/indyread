@@ -1,0 +1,27 @@
+x-standard-logging:
+  &service-logging
+  options:
+    max-size: '500m'
+    max-file: '3'
+  driver: json-file
+
+
+services:
+  indyread-api:
+    restart: unless-stopped
+    build:
+      context: ./
+      dockerfile: api/Dockerfile
+    logging: *service-logging
+    networks:
+      - esnet
+    ports:
+      - 3708:3708
+    environment:
+      - ES_URL=http://indyread-elasticsearch.esnet:9200
+      - AUTOSTART=true
+      - LOG_LEVEL=debug
+      - PORT=3708
+      - LOG_HTTP_REQUESTS=true
+      - LOG_HTTP_RESPONSES=true
+      
