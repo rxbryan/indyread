@@ -3,6 +3,9 @@ const { asyncHandler } = require('../middleware')
 const { ValidationError } = require('../error')
 const { validate } = require('express-validation')
 const Joi = require('joi')
+const { result } = require('lodash')
+const { data } = require('../logging/logger-main')
+const { type } = require('os')
 
 function initTxsApi (app, networkManager, serviceTxs) {
   function getNetworkId (req, res) {
@@ -11,6 +14,31 @@ function initTxsApi (app, networkManager, serviceTxs) {
       return networkManager.getNetworkConfig(networkRef).id
     } catch (err) {
       return res.status(404).send({ message: `Couldn't resolve network you are referencing (${networkRef})` })
+    }
+  }
+
+  function getSubledger(ledgerId) {
+    return ['pool', 'domain', 'config'][ledgerId]
+  }
+
+  function buildResponse(type, identifier, reqId, txn, txnMetadata, reqSignature, rootHash, auditPath) {
+    txn.metadata['reqId'] = reqId
+    return {
+      op: "REPLY",
+      result: {
+        type,
+        identifier,
+        reqId,
+        seqNo: txnMetadata.seqNo,
+        data: {
+          ver: txn.data.ver || 1,
+          txn,
+          txnMetadata,
+          reqSignature,
+          rootHash,
+          auditPath
+        }
+      }
     }
   }
 
@@ -48,54 +76,85 @@ function initTxsApi (app, networkManager, serviceTxs) {
       res.status(200).send(txs)
     }))
 
-  app.get('/api/networks/:networkRef/ledgers/:ledger/txs/:seqNo',
+  // GET_TXN
+  app.get('/api/networks/:networkRef/txs/:seqNo',
     validate(
       {
         query: Joi.object({
-          format: Joi.string().valid('serialized', 'full', 'expansion')
+          ledgerId: Joi.number().valid(0, 1, 2).required(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
         })
       }
     ),
     asyncHandler(async function (req, res) {
-      const { ledger: subledger, seqNo } = req.params
-      let { format } = req.query
-      format = format || 'full'
-      const networkId = getNetworkId(req, res)
-      const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo), format)
-      res.status(200).send(tx)
-    }))
-    
-  app.get('/api/networks/:networkRef/ledgers/:ledger/txs/:seqNo',
-    asyncHandler(async function (req, res) {
-      const { ledger: subledger, seqNo } = req.params
-      let { format } = req.query
-      format = format || 'serialized'
-      const networkId = getNetworkId(req, res)
-      console.log(parseInt(seqNo))
-      const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo), format)
-      res.status(200).send(JSON.parse(tx.idata.json))
-  }))
+      Joi.object({
+        seqNo: Joi.number().min(1).required()
+      }).validate(req.params, (err, ok) => { if (err) throw err })
 
-  app.get('/api/networks/:networkRef/ledgers/:ledger/txs/nym/:nym',
+      const { seqNo } = req.params
+      const { ledgerId,  reqId, identifier } = req.query
+
+      const subledger = getSubledger(ledgerId)
+      const networkId = getNetworkId(req, res)
+      
+      const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo))
+      const originalTx = JSON.parse(tx.idata.json)
+
+      res.status(200).send(
+        buildResponse(
+          3,
+          identifier,
+          reqId,
+          originalTx.txn,
+          originalTx.txnMetadata,
+          originalTx.reqSignature,
+          originalTx.rootHash,
+          originalTx.auditPath
+        )
+      )
+    }))
+
+  app.get('/api/networks/:networkRef/txs/nym/:dest',
   validate(
     {
       query: Joi.object({
         timestamp: Joi.number(),
         seqNo: Joi.number().min(1),
+        reqId: Joi.string().required(),
+        identifier: Joi.string().required()
       })
     }
   ),
   asyncHandler(async function (req, res, next) {
     const networkId = getNetworkId(req, res)
-    const { ledger: subledger, nym } = req.params
-    const { timestamp, seqNo } = req.query
+    const { dest } = req.params
+    const { timestamp, seqNo, reqId, identifier } = req.query
 
     if (timestamp && seqNo) {
       next(new ValidationError("'timestamp' is mutually exclusive with 'seqNo'"))
     }
     else {
-      const txs = await serviceTxs.getTxByType(networkId, subledger, {nym, seqNo, timestamp}, "NYM")
-      res.status(200).send(txs.map(tx => tx.idata.serialized.idata.json))
+      const txs = await serviceTxs.getTxByType(networkId, 'domain', {nym: dest, seqNo, timestamp}, "NYM")
+      res.status(200).send(txs.map(tx => {
+        let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+        originalTx.txn.data.identifier = identifier
+        originalTx.txn.data.txnTime = originalTx.txnMetadata.txnTime
+        originalTx.txn.data.seqNo = tx.imeta.seqNo
+
+        return {
+          op: "REPLY",
+          result: {
+            type: "105",
+            identifier,
+            reqId,
+            seqNo: tx.imeta.seqNo,
+            txnTime: originalTx.txnMetadata.txnTime,
+          },
+          data: originalTx.txn.data,
+          dest: originalTx.txn.data.dest,
+        }
+      }))
     }
 
   }))
