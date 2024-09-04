@@ -115,6 +115,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
       )
     }))
 
+  // GET_NYM
   app.get('/api/networks/:networkRef/txs/nym/:dest',
   validate(
     {
@@ -159,28 +160,48 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
   }))
 
-  app.get('/api/networks/:networkRef/ledgers/:ledger/txs/attrib/:nym',
+  // GET_ATTRIB
+  app.get('/api/networks/:networkRef/txs/attrib/:dest',
   validate(
     {
       query: Joi.object({
         timestamp: Joi.number(),
         seqNo: Joi.number().min(1),
-        raw: Joi.string()
+        raw: Joi.string(),
+        reqId: Joi.string().required(),
+        identifier: Joi.string().required()
       })
     }
   ),
   asyncHandler(async function (req, res, next) {
     const networkId = getNetworkId(req, res)
-    const { ledger: subledger, nym } = req.params
-    const { timestamp, seqNo, raw: rawBase64 } = req.query
+    const { dest: nym } = req.params
+    const { timestamp, seqNo, raw: rawBase64,  reqId, identifier } = req.query
 
     if (timestamp && seqNo) {
       next(new ValidationError("'timestamp' is mutually exclusive with 'seqNo'"))
     }
     else {
       const raw = rawBase64 && Buffer.from(rawBase64, 'base64').toString()
-      const txs = await serviceTxs.getTxByType(networkId, subledger, {nym, timestamp, seqNo, raw: raw}, "ATTRIB")
-      res.status(200).send(txs.map(tx => tx.idata.serialized.idata.json))
+      const txs = await serviceTxs.getTxByType(networkId, 'domain', {nym, timestamp, seqNo, raw: raw}, "ATTRIB")
+      res.status(200).send(txs.map(tx => {
+          let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+
+          return {
+            op: "REPLY",
+            result: {
+              type: "104",
+              identifier,
+              reqId,
+              seqNo: tx.imeta.seqNo,
+              txnTime: originalTx.txnMetadata.txnTime,
+            },
+            data: originalTx.txn.data.raw,
+            dest: originalTx.txn.data.dest,
+            raw: Object.keys(JSON.parse(originalTx.txn.data.raw))[0]
+          }
+        }
+      ))
     }
 
   }))
