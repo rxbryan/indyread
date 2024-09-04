@@ -31,64 +31,95 @@ This API provides endpoints for querying the indy ledger.
                 ]
             ```
 
-* **GET /api/networks/:networkRef/ledgers/:ledger/txs/:seqNo**
+### Read Requests
+
+#### GET_TXN
+
+* **GET /api/networks/:networkRef/txs/:seqNo**
     * **Description:** Retrieve a transaction by id or seqno.
     * **Request Parameters:**
         * `networkRef`: network id.
-        * `ledger`: `domain` `pool` `config`.
-        * `seqNo`: transaction id.
+        * `seqNo`: `data` (int): Requested transaction sequence number (seqNo) as it’s stored on Ledger.
+    * **Request Query:**
+        * `ledgerId` (int enum, required): ID of the ledger the requested transaction belongs to (Pool=0; Domain=1; Config=2).
+        * `reqId`: (required)
+        * `identifier`: (required)
     * **Examples:**
         ```sh
-          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/ledgers/domain/txs/1
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/100?ledgerId=1&reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb
         ```
     * **Response:**
         * **JSON:**
             ```json
                 {
-                  "imeta": {
-                    "subledger": "domain",
-                    "seqNo": 1
-                  },
-                  "idata": {
-                    "serialized": {
-                      "imeta": {
-                        "subledger": "domain",
-                        "seqNo": 1
-                      },
-                      "idata": {
-                        "json": "{\"reqSignature\":{},\"txn\":{\"data\":{\"dest\":\"V4SGRU86Z58d6TV7PBUe6f\",\"role\":\"0\",\"verkey\":\"~CoRER63DVYnWZtK8uAzNbx\"},\"metadata\":{},\"type\":\"1\"},\"txnMetadata\":{\"seqNo\":1},\"ver\":\"1\",\"rootHash\":\"8HZx81ehri6fggMnqGEUUJMmAonfj4XKKg5kyNPPmt5H\",\"auditPath\":[\"3XtSyZ8CQPJUYbc5mFKvUendLZSt4ybG2Y4zRtJEewSL\",\"96irBGYpWrTvrVATexGGvktPrT3WicixwT8BtoZTtkYX\",\"HqXD3TkLbpRuRU7CrrvrBeZwKuNFVCfta1ez7X7jGjtF\",\"3fsGMWtrpYdNiLZKRKGmhGUJTUkdC2yn2yNd8MPGjwdq\",\"BwS8ttPxJXQ4yn5RDy6spyxrFRZkukr9dbs9bjfskz1U\",\"3wvhiYWLX3fRwGp1SoLeMQas6xtRHK8n7a3WqLPiwyMc\",\"8oJHS289uuhcmgrvrzVtXvRGFfoXRnTWZnHQRYopDtUG\",\"B5yx8ExTWjkgaDHuYWbosaoPhuq15uBx1jmp6npp6cKa\",\"41vHGCg6qKUEtLAveyeWLMNdhZoH89Ym6xymFvSj64ER\",\"APznt6o24yBWCNs5tVF4fC6h6rMz1Joj9BYWQuXJH1V5\",\"3EByMrinqTxqaC7VEnQj4bKn29Gg357MoaTJxhZJvAbv\",\"CV3xU14oTyGxemt6ZzLGhcBoTEcQ9MivEgo4fREPJbax\",\"9MvXyCYNaPnTWV5ZW6E8hkPnjEurmTGmzTTUJJ9sGZ3L\",\"8cPhRmSsSLKQjVGdSLcfQT12FdmPVct96ruLzuDzMjUZ\",\"Cc3VieL5aXKyLLqt97PCrC3zoPU2F6wJddDZMhicCGSk\",\"Cbs8mFThL3uUoZNPNJLrzSozYMp1mGPe5z2SuNwFdRUR\",\"5QxygKhC5siMNd3geLBrXcdib341CRTpEFU3wicA6GM7\",\"2kqdayLhGFcDwDizS7Tr4tU7zFQmAAoE7HQjwDsXuYa1\",\"CmvdWARcru6SGgnCjjSvg6cLRwdTAixw2L1KwqHSEXUA\",\"5PevtFLM7muNh9FWdWkkdkXngFQszy6br2kicPkghSC2\",\"DuQMEgUHvqEpBqUj9shiiyn64u3hUu6qe5MCfHJHcpVC\"],\"ledgerSize\":1878460}"
-                      }
-                    },
-                    "expansion": {
-                      "imeta": {
-                        "seqNo": 1,
-                        "subledger": "domain"
-                      },
-                      "idata": {
-                        "txnMetadata": {
-                          "seqNo": 1
+                  "op": "REPLY",
+                  "result": {
+                    "type": 3,
+                    "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                    "reqId": "1514311352551755",
+                    "seqNo": 100,
+                    "data": {
+                      "ver": 1,
+                      "txn": {
+                        "data": {
+                          "dest": "L5ak5y4ctDEqyHJsnRZMJL",
+                          "raw": "{\"endpoint\":{\"endpoint\":\"http://10.1.0.12:8020\",\"routingKeys\":[]}}"
                         },
-                        "txn": {
-                          "metadata": {
-
-                          },
-                          "data": {
-                            "role": "0",
-                            "verkeyFull": "V4SGRU86Z58d6TV7PBUe6fCoRER63DVYnWZtK8uAzNbx",
-                            "roleAction": "SET_TRUSTEE",
-                            "dest": "V4SGRU86Z58d6TV7PBUe6f",
-                            "verkey": "~CoRER63DVYnWZtK8uAzNbx"
-                          },
-                          "typeName": "NYM",
-                          "type": "1"
-                        }
-                      }
+                        "metadata": {
+                          "digest": "bed4b26e608fa866ace669cc18cf79e3b5ff29abe5992cbc57d9088447ff8fe5",
+                          "from": "L5ak5y4ctDEqyHJsnRZMJL",
+                          "payloadDigest": "aa3839b914ad6800e1dbe22737b114960e3534577892c0d3c7270a40791ec554",
+                          "reqId": "1514311352551755"
+                        },
+                        "protocolVersion": 2,
+                        "type": "100"
+                      },
+                      "txnMetadata": {
+                        "seqNo": 100,
+                        "txnId": "L5ak5y4ctDEqyHJsnRZMJL:1:b6bf7bc8d96f3ea9d132c83b3da8e7760e420138485657372db4d6a981d3fd9e",
+                        "txnTime": 1690575694
+                      },
+                      "reqSignature": {
+                        "type": "ED25519",
+                        "values": [
+                          {
+                            "from": "L5ak5y4ctDEqyHJsnRZMJL",
+                            "value": "5KNS3gCwvbdP5yaiMpsWSTKFSwRD7ZKyGHoe7TwtyFuCVAxAeFHrf1r7TfoymjtUSnh9Ykq9u8yKRFYkjLTKwYvR"
+                          }
+                        ]
+                      },
+                      "rootHash": "8HZx81ehri6fggMnqGEUUJMmAonfj4XKKg5kyNPPmt5H",
+                      "auditPath": [
+                        "7U19YUEjKB7fzvLZyuF1vqGAfr3dUg8cHVvmZFc2wmnA",
+                        "3DtZb67YPv8Man8kHCj4M8PWXFDn2WEpnSJPNBZWgGbW",
+                        "ByrpoQo2bYCUs1x8EwWfKBvnY74FW85eTexYN56WVM6R",
+                        "4U4dWZhU4hKedrvs3EJuLQXsQyoBTYo6TbbUqbTMofTK",
+                        "H2todTrd6uQdi9o9UEr41fnXueRvahquNMQxSatfubn1",
+                        "FBBFf4oP7UJgP5bEoDVB4tuULEJHubjS2fnfM3ivuev3",
+                        "BAMh6dZwJov2VUVMeuo4As4QU2eH98EdomrAwUaAfKwr",
+                        "B5yx8ExTWjkgaDHuYWbosaoPhuq15uBx1jmp6npp6cKa",
+                        "41vHGCg6qKUEtLAveyeWLMNdhZoH89Ym6xymFvSj64ER",
+                        "APznt6o24yBWCNs5tVF4fC6h6rMz1Joj9BYWQuXJH1V5",
+                        "3EByMrinqTxqaC7VEnQj4bKn29Gg357MoaTJxhZJvAbv",
+                        "CV3xU14oTyGxemt6ZzLGhcBoTEcQ9MivEgo4fREPJbax",
+                        "9MvXyCYNaPnTWV5ZW6E8hkPnjEurmTGmzTTUJJ9sGZ3L",
+                        "8cPhRmSsSLKQjVGdSLcfQT12FdmPVct96ruLzuDzMjUZ",
+                        "Cc3VieL5aXKyLLqt97PCrC3zoPU2F6wJddDZMhicCGSk",
+                        "Cbs8mFThL3uUoZNPNJLrzSozYMp1mGPe5z2SuNwFdRUR",
+                        "5QxygKhC5siMNd3geLBrXcdib341CRTpEFU3wicA6GM7",
+                        "2kqdayLhGFcDwDizS7Tr4tU7zFQmAAoE7HQjwDsXuYa1",
+                        "CmvdWARcru6SGgnCjjSvg6cLRwdTAixw2L1KwqHSEXUA",
+                        "5PevtFLM7muNh9FWdWkkdkXngFQszy6br2kicPkghSC2",
+                        "DuQMEgUHvqEpBqUj9shiiyn64u3hUu6qe5MCfHJHcpVC"
+                      ]
                     }
                   }
                 }
             ```
 
-* **GET /api/networks/:networkRef/ledgers/:ledger/txs/nym/:dest**
+#### GET_NYM¶
+
+* **GET /api/networks/:networkRef/txs/nym/:dest**
     * **Description:** searches the ledger for a nym/did transaction.
     * **Request Parameters:**
         * `networkRef`: network id.
@@ -97,75 +128,40 @@ This API provides endpoints for querying the indy ledger.
     * **Request query:**
         * `timestamp`: timestamp' is mutually exclusive with 'seqNo'
         * `seqNo`: transaction id. seqNo' is mutually exclusive with 'timestamp'
+        * `reqId`: (required)
+        * `identifier`: (required)
     * **Example**
         ```sh
-        curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/ledgers/domain/txs/nym/RxFcjTjL6jPdn5EEJkNfqt?timestamp=1690575759
+        curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/nym/YT1mzd8om41njS7VuoAwZ4/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb
         ```
     * **Response:**
         * **JSON:**
             ```json
               [
                 {
-                  "reqSignature": {
-                    "type": "ED25519",
-                    "values": [
-                      {
-                        "from": "V4SGRU86Z58d6TV7PBUe6f",
-                        "value": "36TQMq2U6gi9v26Wi6Jxsq87Nq47pZ6LpGiPUquWSAYYDPd2HPp9LgtGEWUD9QMvsYMnw22Q65HV1BukErerq59r"
-                      }
-                    ]
+                  "op": "REPLY",
+                  "result": {
+                    "type": "105",
+                    "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                    "reqId": "1514311352551755",
+                    "seqNo": 14,
+                    "txnTime": 1690575212
                   },
-                  "txn": {
-                    "data": {
-                      "alias": "Bob.agent",
-                      "dest": "RxFcjTjL6jPdn5EEJkNfqt",
-                      "role": "101",
-                      "verkey": "EboVMVodmktudV37A29X4VQebiVYqw3hgKpLT3eyoEEe"
-                    },
-                    "metadata": {
-                      "digest": "44b9693e7153a158bb7f211594665dbd8c30338eef0e640c2a7064e0b20bfcfa",
-                      "from": "V4SGRU86Z58d6TV7PBUe6f",
-                      "payloadDigest": "27e74c52f21f02f7a851c5926f9a43bc8f88c2e18e0c7f698e11ffbd5377a65b",
-                      "reqId": 1690575759048687000
-                    },
-                    "protocolVersion": 2,
-                    "type": "1"
+                  "data": {
+                    "alias": "Bob.agent",
+                    "dest": "YT1mzd8om41njS7VuoAwZ4",
+                    "role": "101",
+                    "verkey": "J99fCbX5wdrohpXmDiRDqJ5psje3MGD2hgEQgoGuy8hV",
+                    "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                    "txnTime": 1690575212,
+                    "seqNo": 14
                   },
-                  "txnMetadata": {
-                    "seqNo": 108,
-                    "txnId": "920910dca299d81cbdfaac71b30f4c9020b0e6bc23aaed61e9967f19fde970d8",
-                    "txnTime": 1690575759
-                  },
-                  "ver": "1",
-                  "rootHash": "8HZx81ehri6fggMnqGEUUJMmAonfj4XKKg5kyNPPmt5H",
-                  "auditPath": [
-                    "Ed2h8E4KrrBnbtMT2ux4xUwQ6CjbVtjJQe3RRhaoRset",
-                    "3nU1KckdUoc7saNEkBF7DAzaUjL1kviA4mHYmcfraAvi",
-                    "5CsxRGiDC93W9frdKmTXttGmdWTSR6E27SzpLLzFz8mj",
-                    "4HA4nytDZ9eXtUGYeNStzuv1VjyYPUUNRKZDkRJf2nCg",
-                    "H2todTrd6uQdi9o9UEr41fnXueRvahquNMQxSatfubn1",
-                    "FBBFf4oP7UJgP5bEoDVB4tuULEJHubjS2fnfM3ivuev3",
-                    "BAMh6dZwJov2VUVMeuo4As4QU2eH98EdomrAwUaAfKwr",
-                    "B5yx8ExTWjkgaDHuYWbosaoPhuq15uBx1jmp6npp6cKa",
-                    "41vHGCg6qKUEtLAveyeWLMNdhZoH89Ym6xymFvSj64ER",
-                    "APznt6o24yBWCNs5tVF4fC6h6rMz1Joj9BYWQuXJH1V5",
-                    "3EByMrinqTxqaC7VEnQj4bKn29Gg357MoaTJxhZJvAbv",
-                    "CV3xU14oTyGxemt6ZzLGhcBoTEcQ9MivEgo4fREPJbax",
-                    "9MvXyCYNaPnTWV5ZW6E8hkPnjEurmTGmzTTUJJ9sGZ3L",
-                    "8cPhRmSsSLKQjVGdSLcfQT12FdmPVct96ruLzuDzMjUZ",
-                    "Cc3VieL5aXKyLLqt97PCrC3zoPU2F6wJddDZMhicCGSk",
-                    "Cbs8mFThL3uUoZNPNJLrzSozYMp1mGPe5z2SuNwFdRUR",
-                    "5QxygKhC5siMNd3geLBrXcdib341CRTpEFU3wicA6GM7",
-                    "2kqdayLhGFcDwDizS7Tr4tU7zFQmAAoE7HQjwDsXuYa1",
-                    "CmvdWARcru6SGgnCjjSvg6cLRwdTAixw2L1KwqHSEXUA",
-                    "5PevtFLM7muNh9FWdWkkdkXngFQszy6br2kicPkghSC2",
-                    "DuQMEgUHvqEpBqUj9shiiyn64u3hUu6qe5MCfHJHcpVC"
-                  ],
-                  "ledgerSize": 1878460
+                  "dest": "YT1mzd8om41njS7VuoAwZ4"
                 }
               ]
             ```
 
+#### GET_ATTRIB
 * **GET /api/networks/:networkRef/ledgers/:ledger/txs/attrib/:dest**
     * **Description:** searches the ledger for a nym/did transaction.
     * **Request Parameters:**
@@ -243,3 +239,14 @@ This API provides endpoints for querying the indy ledger.
               ]
             ```
 
+
+
+#### GET_SCHEMA
+#### GET_CLAIM_DEF
+#### GET_REVOC REG_DEF
+#### GET_REVOC_REG
+#### GET_REVOC_REG_DELTA
+#### GET_AUTH_RULE
+#### GET_TRANSACTION AUTHOR_AGREEMENT
+#### GET_TRANSACTION_AUTHOR_AGREEMENT_AML
+#### GET_CONTEXT
