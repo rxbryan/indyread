@@ -162,79 +162,35 @@ This API provides endpoints for querying the indy ledger.
             ```
 
 #### GET_ATTRIB
-* **GET /api/networks/:networkRef/ledgers/:ledger/txs/attrib/:dest**
+* **GET /api/networks/:networkRef/txs/attrib/:dest**
     * **Description:** searches the ledger for a nym/did transaction.
     * **Request Parameters:**
         * `networkRef`: network id.
-        * `ledger`: `domain` `pool` `config`.
         * `dest`: nym to search for.
     * **Request query:**
         * `timestamp`: timestamp' is mutually exclusive with 'seqNo'.
         * `seqNo`: transaction id. seqNo' is mutually exclusive with 'timestamp'.
-        * `raw`: Requested attribute name *base64 encoded*.
+        * `raw`: *base64 encoded* Requested attribute name.
     * **Example**
         ```sh
-        curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/ledgers/domain/txs/attrib/RxFcjTjL6jPdn5EEJkNfqt?timestamp=1690575762&raw=eyJlbmRwb2ludCI6eyJlbmRwb2ludCI6Imh0dHA6Ly8xMC4xLjAuMTI6ODA0MCIsInJvdXRpbmdLZXlzIjpbXX19
+        curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/attrib/RxFcjTjL6jPdn5EEJkNfqt?timestamp=1690575762&raw=eyJlbmRwb2ludCI6eyJlbmRwb2ludCI6Imh0dHA6Ly8xMC4xLjAuMTI6ODA0MCIsInJvdXRpbmdLZXlzIjpbXX19&reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb
         ```
     * **Response:**
         * **JSON:**
             ```json
               [
                 {
-                  "reqSignature": {
-                    "type": "ED25519",
-                    "values": [
-                      {
-                        "from": "RxFcjTjL6jPdn5EEJkNfqt",
-                        "value": "4WnvhzTmUgQpTvAQkQUpQuxojX4QdvxX4BZ3RB11yC8RtqVTRVyjD9iGP7NCkUZjavrhLY1ArHVpWcofxrorgg9U"
-                      }
-                    ]
-                  },
-                  "txn": {
-                    "data": {
-                      "dest": "RxFcjTjL6jPdn5EEJkNfqt",
-                      "raw": "{\"endpoint\":{\"endpoint\":\"http://10.1.0.12:8040\",\"routingKeys\":[]}}"
-                    },
-                    "metadata": {
-                      "digest": "470e055c8e402dbccb18aca3482c8d8a40195e726e5dedbb28be02e4d0c4bb46",
-                      "from": "RxFcjTjL6jPdn5EEJkNfqt",
-                      "payloadDigest": "e88247cc7a2fb070b28cc73ac52d2e72aaec9c01ec795691a12ac41b75cc2286",
-                      "reqId": 1690575762396969000
-                    },
-                    "protocolVersion": 2,
-                    "type": "100"
-                  },
-                  "txnMetadata": {
+                  "op": "REPLY",
+                  "result": {
+                    "type": "104",
+                    "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                    "reqId": "1514311352551755",
                     "seqNo": 109,
-                    "txnId": "RxFcjTjL6jPdn5EEJkNfqt:1:b6bf7bc8d96f3ea9d132c83b3da8e7760e420138485657372db4d6a981d3fd9e",
                     "txnTime": 1690575762
                   },
-                  "ver": "1",
-                  "rootHash": "8HZx81ehri6fggMnqGEUUJMmAonfj4XKKg5kyNPPmt5H",
-                  "auditPath": [
-                    "4oBcnv2ehbLTMo5Bshi6ovrPg9PkTizGXLvsUkxciVxA",
-                    "57f4BXDx52XhRJ3oycp3FkknqgNbeAijxoy65rnVQa62",
-                    "AWZQRDA9mHJwUcayEahp2vHYgtBbxHjFDGgoDMqfrRum",
-                    "4HA4nytDZ9eXtUGYeNStzuv1VjyYPUUNRKZDkRJf2nCg",
-                    "H2todTrd6uQdi9o9UEr41fnXueRvahquNMQxSatfubn1",
-                    "FBBFf4oP7UJgP5bEoDVB4tuULEJHubjS2fnfM3ivuev3",
-                    "BAMh6dZwJov2VUVMeuo4As4QU2eH98EdomrAwUaAfKwr",
-                    "B5yx8ExTWjkgaDHuYWbosaoPhuq15uBx1jmp6npp6cKa",
-                    "41vHGCg6qKUEtLAveyeWLMNdhZoH89Ym6xymFvSj64ER",
-                    "APznt6o24yBWCNs5tVF4fC6h6rMz1Joj9BYWQuXJH1V5",
-                    "3EByMrinqTxqaC7VEnQj4bKn29Gg357MoaTJxhZJvAbv",
-                    "CV3xU14oTyGxemt6ZzLGhcBoTEcQ9MivEgo4fREPJbax",
-                    "9MvXyCYNaPnTWV5ZW6E8hkPnjEurmTGmzTTUJJ9sGZ3L",
-                    "8cPhRmSsSLKQjVGdSLcfQT12FdmPVct96ruLzuDzMjUZ",
-                    "Cc3VieL5aXKyLLqt97PCrC3zoPU2F6wJddDZMhicCGSk",
-                    "Cbs8mFThL3uUoZNPNJLrzSozYMp1mGPe5z2SuNwFdRUR",
-                    "5QxygKhC5siMNd3geLBrXcdib341CRTpEFU3wicA6GM7",
-                    "2kqdayLhGFcDwDizS7Tr4tU7zFQmAAoE7HQjwDsXuYa1",
-                    "CmvdWARcru6SGgnCjjSvg6cLRwdTAixw2L1KwqHSEXUA",
-                    "5PevtFLM7muNh9FWdWkkdkXngFQszy6br2kicPkghSC2",
-                    "DuQMEgUHvqEpBqUj9shiiyn64u3hUu6qe5MCfHJHcpVC"
-                  ],
-                  "ledgerSize": 1878460
+                  "data": "{\"endpoint\":{\"endpoint\":\"http://10.1.0.12:8040\",\"routingKeys\":[]}}",
+                  "dest": "RxFcjTjL6jPdn5EEJkNfqt",
+                  "raw": "endpoint"
                 }
               ]
             ```
