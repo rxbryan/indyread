@@ -151,6 +151,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
             reqId,
             seqNo: tx.imeta.seqNo,
             txnTime: originalTx.txnMetadata.txnTime,
+            state_proof: {}
           },
           data: originalTx.txn.data,
           dest: originalTx.txn.data.dest,
@@ -195,6 +196,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
               reqId,
               seqNo: tx.imeta.seqNo,
               txnTime: originalTx.txnMetadata.txnTime,
+              state_proof: {}
             },
             data: originalTx.txn.data.raw,
             dest: originalTx.txn.data.dest,
