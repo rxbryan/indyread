@@ -8,7 +8,13 @@ const {
   esFilterByNYM, 
   esMatchTxType, 
   esMatchTxTime,
-  esFilterByAttribName
+  esFilterByAttribName,
+  esMatchFromDID,
+  esMatchSchemaName,
+  esMatchSchemaVersion,
+  esMatchSchemaRef,
+  esMatchTxnId,
+  esMatchRevocRegDefId
 } = require('./es-query-builder')
 const util = require('util')
 
@@ -107,10 +113,8 @@ function createStorageReadEs (esClient, esIndex) {
       body: { query, sort }
     }
 
-    console.log(JSON.stringify(query))
     const body = await executeEsSearch(searchRequest)
     const fullTxs = body.hits.hits.map(h => h._source)
-    //console.log(JSON.stringify(fullTxs))
     return fullTxs
   }
 
@@ -137,6 +141,36 @@ function createStorageReadEs (esClient, esIndex) {
     //console.log(JSON.stringify(fullTxs))
     return fullTxs
   }
+
+  async function getSchema (subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = esAndFilters(
+      subledgerTxsQuery,
+      esMatchTxType("SCHEMA"),
+      esMatchFromDID(queries.from),
+      esMatchSchemaName(queries.data.name),
+      esMatchSchemaVersion(queries.data.version)
+    )
+    
+    console.log(query)
+
+    const tx = await searchOneDocument(esClient, esIndex, query)
+    return tx
+  }
+
+  async function getClaimDef (subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = esAndFilters(
+      subledgerTxsQuery,
+      esMatchTxType("CLAIM_DEF"),
+      esMatchFromDID(queries.from),
+      esMatchSchemaRef(queries.ref),
+
+    )
+    const tx = await searchOneDocument(esClient, esIndex, query)
+    return tx
+  }
+
 
   /*
   Returns array of (by default all) transactions.
@@ -185,6 +219,8 @@ function createStorageReadEs (esClient, esIndex) {
     getOneTx,
     getNYM,
     getAttrib,
+    getSchema,
+    getClaimDef,
     getManyTxs,
     getTxCount
   }

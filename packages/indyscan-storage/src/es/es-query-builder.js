@@ -37,9 +37,71 @@ function esFilterByAttribName (name) {
   }
 }
 
+function esMatchFromDID(dest) {
+  return {
+    match: {
+      "idata.expansion.idata.txn.metadata.from": dest
+    }
+  }
+}
+
+function esMatchSchemaName(name) {
+  return {
+    match: {
+      "idata.expansion.idata.txn.data.data.name": {
+        "query": name,
+        "analyzer": "standard"
+      }
+    }
+  }
+}
+
+function esMatchSchemaVersion(version) {
+  return {
+    match: {
+      "idata.expansion.idata.txn.data.data.version": {
+        "query": version,
+        "analyzer": "standard"
+      }
+    }
+  }
+}
+
+function esMatchSchemaRef(ref) {
+  return {
+    term: {
+      'idata.expansion.idata.txn.data.refSchemaTxnSeqno': {
+        value: ref
+      }
+    }
+  }
+}
+
+function esMatchTxnId(id) {
+  return {
+    match: {
+      "idata.expansion.idata.txnMetadata.txnId": {
+        "query": id,
+        "analyzer": "keyword"
+      }
+    }
+  }
+}
+
+function esMatchRevocRegDefId(id) {
+  return {
+    match: {
+      "idata.expansion.idata.txn.data.revocRegDefId": {
+        "query": id,
+        "analyzer": "keyword"
+      }
+    }
+  }
+}
+
 function esMatchTxTime(utime) {
   return {
-    "match": {
+    match: {
       "idata.expansion.idata.txnMetadata.txnTime": {
         "query": new Date(utime * 1000).toISOString(),
         "analyzer": "keyword"
@@ -165,6 +227,12 @@ module.exports.esFilterByTxTypeNames = esFilterByTxTypeNames
 module.exports.esMatchTxType = esMatchTxType
 module.exports.esFilterByNYM = esFilterByNYM
 module.exports.esFilterByAttribName = esFilterByAttribName
+module.exports.esMatchFromDID = esMatchFromDID
+module.exports.esMatchSchemaName = esMatchSchemaName
+module.exports.esMatchSchemaVersion = esMatchSchemaVersion
+module.exports.esMatchSchemaRef = esMatchSchemaRef
+module.exports.esMatchTxnId = esMatchTxnId
+module.exports.esMatchRevocRegDefId = esMatchRevocRegDefId
 module.exports.esMatchTxTime = esMatchTxTime
 module.exports.esFilterTxnAfterTime = esFilterTxnAfterTime
 module.exports.esFilterTxnBeforeTime = esFilterTxnBeforeTime

@@ -52,6 +52,10 @@ function createServiceTxs (ledgerStorageManager) {
         return storage.getNYM(subledger, query)
       case "ATTRIB":
         return storage.getAttrib(subledger, query)
+      case "SCHEMA":
+        return storage.getSchema(subledger, query)
+      case "CLAIM_DEF":
+        return storage.getClaimDef(subledger, query)
       default:
         return {}
     }
