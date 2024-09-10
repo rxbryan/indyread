@@ -28,11 +28,7 @@ function esFilterByNYM (nym) {
 function esFilterByAttribName (name) {
   return {
     match: {
-      'idata.expansion.idata.txn.data.raw': {
-        'query': name,
-        'analyzer': 'standard'
-      }
-
+      'idata.expansion.idata.txn.data.raw': name
     }
   }
 }
@@ -48,10 +44,7 @@ function esMatchFromDID(dest) {
 function esMatchSchemaName(name) {
   return {
     match: {
-      "idata.expansion.idata.txn.data.data.name": {
-        "query": name,
-        "analyzer": "standard"
-      }
+      "idata.expansion.idata.txn.data.data.name": name
     }
   }
 }
@@ -59,10 +52,7 @@ function esMatchSchemaName(name) {
 function esMatchSchemaVersion(version) {
   return {
     match: {
-      "idata.expansion.idata.txn.data.data.version": {
-        "query": version,
-        "analyzer": "standard"
-      }
+      "idata.expansion.idata.txn.data.data.version": version
     }
   }
 }
@@ -80,10 +70,7 @@ function esMatchSchemaRef(ref) {
 function esMatchTxnId(id) {
   return {
     match: {
-      "idata.expansion.idata.txnMetadata.txnId": {
-        "query": id,
-        "analyzer": "keyword"
-      }
+      "idata.expansion.idata.txnMetadata.txnId": id
     }
   }
 }

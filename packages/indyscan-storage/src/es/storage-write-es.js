@@ -43,6 +43,14 @@ async function createStorageWriteEs (esClient, esIndex, esReplicaCount, logger =
     for (const [field, fieldMapping] of Object.entries(fieldMappings)) {
       esMappingDefinition.properties[`idata.${formatName}.idata.${field}`] = fieldMapping
     }
+
+    // Allow exact matching for these fields. 
+    esMappingDefinition.properties['idata.expansion.idata.txn.data.dest'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txn.data.raw'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txn.metadata.from'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txn.data.data.name'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txn.data.data.version'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txnMetadata.txnId'] = { type: 'keyword' }
     esMappingDefinition.properties[`idata.${formatName}.imeta.subledger`] = { type: 'keyword' }
     esMappingDefinition.properties[`idata.${formatName}.imeta.seqNo`] = { type: 'integer' }
     try {
