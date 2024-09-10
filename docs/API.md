@@ -299,6 +299,52 @@ This API provides endpoints for querying the indy ledger.
             ```
 
 #### GET_REVOC REG_DEF
+* **GET /api/networks/:networkRef/txs/revoc-reg-def/:id**
+    * **Description:** searches the ledger for a nym/did transaction.
+    * **Request Parameters:**
+        * `networkRef`: network id.
+        * `id`: Revocation Registry Definition’s unique identifier (txid).
+    * **Request query:**
+        * `reqId`: (required)
+        * `identifier`: (required)
+    * **Example**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg-def/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb
+        ```
+    * **Response:**
+        * **JSON:**
+        ```json
+        {
+          "op": "REPLY",
+          "result": {
+            "type": "115",
+            "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+            "reqId": "1514311352551755",
+            "seqNo": 301,
+            "txnTime": 1690590785,
+            "state_proof": {
+
+            }
+          },
+          "data": {
+            "credDefId": "GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable",
+            "id": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+            "revocDefType": "CL_ACCUM",
+            "tag": "ef788d60-82d2-4076-ac74-3b8ebd46da68",
+            "value": {
+              "issuanceType": "ISSUANCE_BY_DEFAULT",
+              "maxCredNum": 1000,
+              "publicKeys": {
+                "accumKey": {
+                  "z": "1 070E1B39601EA6157F4D21DE9896075CD3C35B2CD5B021769C89D14A2A118936 1 19D6564D67CE53F18E6D308DA4041EF519A30801C88718E2E12B717B745C7D33 1 1329F6B3C0C4D26206B80E9C91160835C1D42179ABBF1BDDDDFA8D36CF540B8B 1 178FE51D06194587B0A42CE6B48034D9C0687FCFB75A5A9DE4E7643ECEC6B42C 1 248FC53C6A479AF5B9AB4A7BF6F869D7A3D88C57CF197D3CAF9E0C18F215F67E 1 216D744DB04BEC4BCA979BFBFFFC146E9700413C46B89E076A1BEA7DCAED73C5 1 0ABA18AE0B338680CCF4E0919201707331569B80F71D03CB76382F4147D1814C 1 217D7C80BF9C9FDA1F65AAC9D310F40DB32A107A839FD1018538B8986208064B 1 06182EA221C9E8FED88E06E199FA44391DA0B43E8498EDCD8A3D4DB5CE15CC4F 1 1181C841EB5E472ED380C7037C4DED251596E88F3D28B16E7910315E6FEE3CF5 1 0A25810504B5AA732AC5EFAD601071DF220819CA4ED554E2496023A5EC69AA0A 1 13EB55F7E0D2805CBB48648650A370338E540973416A1E78C0F327B1A219673B"
+                }
+              },
+              "tailsHash": "4ZpAkyEg7xA6HADcpfuCkyUMLvU8m3hgAu2eWmffZETC",
+              "tailsLocation": "https://tails.vonx.io/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68"
+            }
+          }
+        }
+        ```
 #### GET_REVOC_REG
 #### GET_REVOC_REG_DELTA
 #### GET_AUTH_RULE
