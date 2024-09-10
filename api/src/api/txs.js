@@ -208,6 +208,99 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
   }))
 
+  //GET_SCHEMA
+  app.get('/api/networks/:networkRef/txs/schema/:from',
+    validate(
+      {
+        query: Joi.object({
+          name: Joi.string().required(),
+          version: Joi.string().required(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res) {
+      const networkId = getNetworkId(req, res)
+      const { from } = req.params
+      const { version, name,  reqId, identifier } = req.query
+
+      const data = {version, name}
+      const tx = await serviceTxs.getTxByType(networkId, 'domain', {from, data}, "SCHEMA")
+
+      let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+
+      const result = {
+        op: "REPLY",
+        result: {
+          type: "107",
+          identifier,
+          reqId,
+          seqNo: tx.imeta.seqNo,
+          txnTime: originalTx.txnMetadata.txnTime,
+          state_proof: {}
+        },
+        data: tx.idata.expansion.idata.txn.data.data,
+        dest: from
+      }
+
+      res.status(200).send(result)
+
+  }))
+
+  //GET_CLAIM_DEF
+  app.get('/api/networks/:networkRef/txs/claim-def/:from',
+    validate(
+      {
+        query: Joi.object({
+          ref: Joi.string().required(),
+          signature_type: Joi.string().valid("CL").required(),
+          tag: Joi.string().required(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res, next) {
+      const networkId = getNetworkId(req, res)
+      const { from } = req.params
+      const {
+        ref,
+        signature_type,
+        tag,
+        reqId,
+        identifier
+      } = req.query
+
+      const tx = await serviceTxs.getTxByType(networkId, 'domain', { from, ref, signature_type }, "CLAIM_DEF")
+
+      let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+
+      console.log(JSON.stringify(originalTx.txn.data, null, 2))
+      console.log(tag, originalTx.txn.data.tag)
+      const result = tag !==  originalTx.txn.data.tag ? {} : {
+        op: "REPLY",
+        result: {
+          type: "108",
+          identifier,
+          reqId,
+          seqNo: tx.imeta.seqNo,
+          txnTime: originalTx.txnMetadata.txnTime,
+          state_proof: {}
+        },
+        data: originalTx.txn.data.data,
+        signature_type,
+        origin: from,
+        ref,
+        tag
+      }
+
+      console.log(JSON.stringify(result, null, 2))
+      res.status(200).send(result)
+
+  }))
+
+
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
     validate(
       {
