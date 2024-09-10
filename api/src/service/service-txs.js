@@ -56,6 +56,9 @@ function createServiceTxs (ledgerStorageManager) {
         return storage.getSchema(subledger, query)
       case "CLAIM_DEF":
         return storage.getClaimDef(subledger, query)
+      case "REVOC_REG_DEF":
+        console.log("revoc_reg_def")
+        return storage.getRevocRegDef(subledger, query)
       default:
         return {}
     }

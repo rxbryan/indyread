@@ -261,7 +261,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
         })
       }
     ),
-    asyncHandler(async function (req, res, next) {
+    asyncHandler(async function (req, res) {
       const networkId = getNetworkId(req, res)
       const { from } = req.params
       const {
@@ -300,6 +300,41 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
   }))
 
+  //GET_REVOC REG_DEF
+  app.get('/api/networks/:networkRef/txs/revoc-reg-def/:id',
+    validate(
+      {
+        query: Joi.object({
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res) {
+      const networkId = getNetworkId(req, res)
+      const { id } = req.params
+      const { reqId, identifier } = req.query
+
+      const tx = await serviceTxs.getTxByType(networkId, 'domain', { id }, "REVOC_REG_DEF")
+
+      let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+
+      const result = {
+        op: "REPLY",
+        result: {
+          type: "115",
+          identifier,
+          reqId,
+          seqNo: tx.imeta.seqNo,
+          txnTime: originalTx.txnMetadata.txnTime,
+          state_proof: {}
+        },
+        data: originalTx.txn.data,
+      }
+
+      res.status(200).send(result)
+
+  }))
 
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
     validate(
