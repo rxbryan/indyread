@@ -103,7 +103,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
       res.status(200).send(
         buildResponse(
-          3,
+          "3",
           identifier,
           reqId,
           originalTx.txn,
@@ -233,6 +233,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
       const result = {
         op: "REPLY",
         result: {
+          data: tx.idata.expansion.idata.txn.data.data,
           type: "107",
           identifier,
           reqId,
@@ -240,7 +241,6 @@ function initTxsApi (app, networkManager, serviceTxs) {
           txnTime: originalTx.txnMetadata.txnTime,
           state_proof: {}
         },
-        data: tx.idata.expansion.idata.txn.data.data,
         dest: from
       }
 
@@ -281,6 +281,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
       const result = tag !==  originalTx.txn.data.tag ? {} : {
         op: "REPLY",
         result: {
+          data: originalTx.txn.data.data,
           type: "108",
           identifier,
           reqId,
@@ -288,7 +289,6 @@ function initTxsApi (app, networkManager, serviceTxs) {
           txnTime: originalTx.txnMetadata.txnTime,
           state_proof: {}
         },
-        data: originalTx.txn.data.data,
         signature_type,
         origin: from,
         ref,
@@ -327,9 +327,47 @@ function initTxsApi (app, networkManager, serviceTxs) {
           reqId,
           seqNo: tx.imeta.seqNo,
           txnTime: originalTx.txnMetadata.txnTime,
+          data: originalTx.txn.data,
           state_proof: {}
         },
-        data: originalTx.txn.data,
+      }
+
+      res.status(200).send(result)
+
+  }))
+
+  //GET_REVOC REG_DEF
+  app.get('/api/networks/:networkRef/txs/revoc-reg/:revocRegDefId',
+    validate(
+      {
+        query: Joi.object({
+          timestamp: Joi.number().required(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res) {
+      const networkId = getNetworkId(req, res)
+      const { revocRegDefId } = req.params
+      const { timestamp, reqId, identifier } = req.query
+
+      const tx = await serviceTxs.getTxByType(networkId, 'domain', { revocRegDefId, timestamp }, "REVOC_REG_ENTRY")
+
+      let originalTx = JSON.parse(tx.idata.serialized.idata.json)
+      originalTx.txn.data.id = revocRegDefId
+      const result = {
+        op: "REPLY",
+        result: {
+          type: "116",
+          identifier,
+          reqId,
+          revocRegDefId,
+          seqNo: tx.imeta.seqNo,
+          txnTime: originalTx.txnMetadata.txnTime,
+          data: originalTx.txn.data,
+          state_proof: {}
+        },
       }
 
       res.status(200).send(result)

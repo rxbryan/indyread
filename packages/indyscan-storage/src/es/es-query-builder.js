@@ -78,10 +78,7 @@ function esMatchTxnId(id) {
 function esMatchRevocRegDefId(id) {
   return {
     match: {
-      "idata.expansion.idata.txn.data.revocRegDefId": {
-        "query": id,
-        "analyzer": "keyword"
-      }
+      "idata.expansion.idata.txn.data.revocRegDefId": id
     }
   }
 }
