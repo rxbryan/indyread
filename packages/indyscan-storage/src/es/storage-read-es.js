@@ -183,6 +183,18 @@ function createStorageReadEs (esClient, esIndex) {
     return tx
   }
 
+  async function getRevocReg (subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = esAndFilters(
+      subledgerTxsQuery,
+      esMatchTxType("REVOC_REG_ENTRY"),
+      esMatchRevocRegDefId(queries.revocRegDefId),
+      esMatchTxTime(queries.timestamp)
+    )
+    console.log(JSON.stringify(query, null, 2))
+    const tx = await searchOneDocument(esClient, esIndex, query)
+    return tx
+  }
 
   /*
   Returns array of (by default all) transactions.
@@ -234,6 +246,7 @@ function createStorageReadEs (esClient, esIndex) {
     getSchema,
     getClaimDef,
     getRevocRegDef,
+    getRevocReg,
     getManyTxs,
     getTxCount
   }
