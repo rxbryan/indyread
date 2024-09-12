@@ -374,6 +374,95 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
   }))
 
+  function getDelta(to, from = null ) {
+    if (!from) {
+      return {issued: to.issued, revoked: to.revoked}
+    }
+
+    const issued = to.issued.filter(x => !from.issued.includes(x))
+    const revoked = from.issued.filter(x => !to.issued.includes(x))
+
+    return {issued, revoked}
+  }
+
+  //GET_REVOC REG_DELTA
+  app.get('/api/networks/:networkRef/txs/revoc-reg-delta/:revocRegDefId',
+    validate(
+      {
+        query: Joi.object({
+          from: Joi.number(),
+          to: Joi.number().required(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res) {
+      const networkId = getNetworkId(req, res)
+      const { revocRegDefId } = req.params
+      const { from, to, reqId, identifier } = req.query
+
+      const entry_to = await serviceTxs.getTxByType(networkId, 'domain', { revocRegDefId, timestamp: to }, "REVOC_REG_ENTRY")
+      const entry_from = from && (await serviceTxs.getTxByType(networkId, 'domain', { revocRegDefId, timestamp: from }, "REVOC_REG_ENTRY"))
+
+      const {issued, revoked} = getDelta({
+        revoked: entry_to.idata.expansion.idata.txn.data.value.revoked || [],
+        issued: entry_to.idata.expansion.idata.txn.data.value.issued || []
+      }, entry_from && {
+        revoked: entry_from.idata.expansion.idata.txn.data.value.revoked || [],
+        issued: entry_from.idata.expansion.idata.txn.data.value.issued || []
+      })
+
+
+      let entry_to_originalTx = JSON.parse(entry_to.idata.serialized.idata.json)
+      let entry_from_originalTx = entry_from && JSON.parse(entry_from.idata.serialized.idata.json)
+
+      const value = {
+        accum_to: {
+          "revocDefType": entry_to.idata.expansion.idata.txn.data.revocDefType, 
+          "revocRegDefId": entry_to.idata.expansion.idata.txn.data.revocRegDefId, 
+          "txnTime": entry_to_originalTx.txnMetadata.txnTime,
+          "seqNo": entry_to.imeta.seqNo,
+          "value": {
+            "accum": entry_to.idata.expansion.idata.txn.data.value.accum
+          }
+        },
+        revoked,
+        issued,
+        accum_from: entry_from_originalTx && {
+          "revocDefType": entry_from.idata.expansion.idata.txn.data.revocDefType, 
+          "revocRegDefId": entry_from.idata.expansion.idata.txn.data.revocRegDefId, 
+          "txnTime": entry_from_originalTx.txnMetadata.txnTime,
+          "seqNo": entry_from.imeta.seqNo,
+          "value": {
+            "accum": entry_from.idata.expansion.idata.txn.data.value.accum
+          }
+        }
+      }
+
+      const result = {
+        op: "REPLY",
+        result: {
+          type: "117",
+          identifier,
+          reqId,
+          revocRegDefId,
+          seqNo: entry_to.imeta.seqNo,
+          txnTime: entry_to_originalTx.txnMetadata.txnTime,
+          data: {
+            "revocDefType": entry_to.idata.expansion.idata.txn.data.revocDefType, 
+            "revocRegDefId": entry_to.idata.expansion.idata.txn.data.revocRegDefId,
+            value,
+            stateProofFrom: entry_from && {}
+          },
+          state_proof: {}
+        },
+      }
+
+      res.status(200).send(result)
+
+  }))
+
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
     validate(
       {
