@@ -120,7 +120,7 @@ This API provides endpoints for querying the indy ledger.
 #### GET_NYM¶
 
 * **GET /api/networks/:networkRef/txs/nym/:dest**
-    * **Description:** searches the ledger for a nym/did transaction.
+    * **Description:** Gets information about a DID (NYM).
     * **Request Parameters:**
         * `networkRef`: network id.
         * `ledger`: `domain` `pool` `config`.
@@ -163,10 +163,10 @@ This API provides endpoints for querying the indy ledger.
 
 #### GET_ATTRIB
 * **GET /api/networks/:networkRef/txs/attrib/:dest**
-    * **Description:** searches the ledger for a nym/did transaction.
+    * **Description:** Gets information about an Attribute for the specified DID.
     * **Request Parameters:**
         * `networkRef`: network id.
-        * `dest`: nym to search for.
+        * `dest`: Target DID.
     * **Request query:**
         * `timestamp`: timestamp' is mutually exclusive with 'seqNo'.
         * `seqNo`: transaction id. seqNo' is mutually exclusive with 'timestamp'.
@@ -201,10 +201,10 @@ This API provides endpoints for querying the indy ledger.
 
 #### GET_SCHEMA
 * **GET /api/networks/:networkRef/txs/schema/:from**
-    * **Description:** searches the ledger for a nym/did transaction.
+    * **Description:** Gets Claim’s Schema.
     * **Request Parameters:**
         * `networkRef`: network id.
-        * `from`: from DID.
+        * `from`: Schema Issuer’s DID.
     * **Request query:**
         * `name`: Schema’s name string.
         * `version`: Schema’s version string.
@@ -246,7 +246,7 @@ This API provides endpoints for querying the indy ledger.
 
 #### GET_CLAIM_DEF
 * **GET /api/networks/:networkRef/txs/claim-def/:origin**
-    * **Description:** searches the ledger for a nym/did transaction.
+    * **Description:** Gets Claim Definition.
     * **Request Parameters:**
         * `networkRef`: network id.
         * `origin`: Claim Definition Issuer’s DID. from DID.
@@ -299,8 +299,8 @@ This API provides endpoints for querying the indy ledger.
             ```
 
 #### GET_REVOC REG_DEF
-* **GET /api/networks/:networkRef/txs/revoc-reg-def/:id**
-    * **Description:** searches the ledger for a nym/did transaction.
+* **GET /api/networks/:networkRef/txs/revoc-reg-def/:id**/api/networks/:networkRef/txs/revoc-reg/:revocRegDefId
+    * **Description:** Gets a Revocation Registry Definition.
     * **Request Parameters:**
         * `networkRef`: network id.
         * `id`: Revocation Registry Definition’s unique identifier (txid).
@@ -346,7 +346,110 @@ This API provides endpoints for querying the indy ledger.
         }
         ```
 #### GET_REVOC_REG
+* **GET /api/networks/:networkRef/txs/revoc-reg/:revocRegDefId**
+    * **Description:** Gets a Revocation Registry Accumulator.
+    * **Request Parameters:**
+        * `networkRef`: network id.
+        * `revocRegDefId`: The corresponding Revocation Registry Definition’s unique identifier (txid).
+    * **Request query:**
+        * `timestamp`: (required) The time (from the ledger point of view) for which we want to get the accumulator value.
+        * `reqId`: (required)
+        * `identifier`: (required)
+    * **Example**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&timestamp=1690590788
+        ```
+    * **Response:**
+        * **JSON:**
+        ```json
+              {
+                "op": "REPLY",
+                "result": {
+                  "type": "116",
+                  "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                  "reqId": "1514311352551755",
+                  "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+                  "seqNo": 302,
+                  "txnTime": 1690590788,
+                  "data": {
+                    "revocDefType": "CL_ACCUM",
+                    "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+                    "value": {
+                      "accum": "21 13EDFE40DCA2F53A4CD4D1ED195B2C5541CDB73C461DBB138A32FCF288C56E912 21 11A89378DB0605BA061DE0B52432A35E36B2229130055018FD8E9C26B0351BDBA 6 6BE7BBE29AA2E20E131C5A61EE5B8F7CC4F0A9A54FD9DFD1D32E6173D52F2DEA 4 18A8E8355BA3A26A7E6282548FD7DF9EDA8922977FF446BAAAD8713E65936100 6 718FB7929390E9E93A618850494DB51975E304C5AEC4ABF6D33F9F48A533682D 4 27B882E719BB90A6893461BDA93E10B2B1E2F92D9A1B16DDDFA31340D7B2298D"
+                    },
+                    "id": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68"
+                  },
+                  "state_proof": {
+
+                  }
+                }
+              }
+        ```
+
 #### GET_REVOC_REG_DELTA
+* **GET /api/networks/:networkRef/txs/revoc-reg-delta/:revocRegDefId**
+    * **Description:** Gets a Revocation Registry Delta (accum values, and delta of issues/revoked indices) for the given time interval (from and to).
+    * **Request Parameters:**
+        * `networkRef`: network id.
+        * `revocRegDefId`: The corresponding Revocation Registry Definition’s unique identifier (txid).
+    * **Request query:**
+        * `to`: (required integer as POSIX timestamp) The time (from the ledger point of view) we want to return accum and indices before, that is the right bound of the delta interval.
+        * `from`: (optional) The time (from the ledger point of view) we want to return accum and indices after, that is the left bound of the delta interval.
+        * `reqId`: (required)
+        * `identifier`: (required)
+    * **Example**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg-delta/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&from=1690593703&to=1690594373
+        ```
+    * **Response:**
+        * **JSON:**
+        ```json
+          {
+            "op": "REPLY",
+            "result": {
+              "type": "117",
+              "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+              "reqId": "1514311352551755",
+              "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+              "seqNo": 310,
+              "txnTime": 1690594373,
+              "data": {
+                "revocDefType": "CL_ACCUM",
+                "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+                "value": {
+                  "accum_to": {
+                    "revocDefType": "CL_ACCUM",
+                    "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+                    "txnTime": 1690594373,
+                    "seqNo": 310,
+                    "value": {
+                      "accum": "21 107E1E33F929811AADCD600D1789E5E3061F54936FDA032FB73076FA144E2EBDC 21 13971BE6BC1BE5A7473773CDA676D201E178FAC14683C15C04536FC778B737F67 6 838295E8FF7604395152B3001DEF936E8050D9DA12B116E95F138ABC30B95125 4 379D2F469ADD248DB2EE6B8BE83E7E1FAC89D854DC5BF02A8F647CB1CD08C9EB 6 67AF49C017DBADFFCAE757A5032E5EE28B86821640BEF008C886CD0E0C5C290B 4 09860295C1831ABBFE90B8D270B7421390EBF8421CA3486B3C91F0D36A82733F"
+                    }
+                  },
+                  "revoked": [],
+                  "issued": [],
+                  "accum_from": {
+                    "revocDefType": "CL_ACCUM",
+                    "revocRegDefId": "GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68",
+                    "txnTime": 1690593703,
+                    "seqNo": 309,
+                    "value": {
+                      "accum": "21 1327C59A2F0444CF3098CC6978710828529F8C5803B72E285DAAEB6D16DC46D8A 21 12D62B9A89669BFC37F951D6F941DA0EB5B4DAFC1849ECD69751973C43146CDDF 6 69DBEC95DB613BBE9A4044A775DCBB291594019AD8302FBEA59F7A53490897EE 4 0FB94088C104FF1AF9358C0DCDF905C228D20042AF5ECA0374C63B29DAE6C1CC 6 8DD1DC40ECDD6A5570FAE4A821220E6A7BE28AFF1BA0383E6265F479738BB967 4 34FE0894704C49AC4B50C51838B79E7C062F8431ED0614CDA7678E7AAD37316B"
+                    }
+                  }
+                },
+                "stateProofFrom": {
+
+                }
+              },
+              "state_proof": {
+
+              }
+            }
+          }
+        ```
+
+
 #### GET_AUTH_RULE
 #### GET_TRANSACTION AUTHOR_AGREEMENT
 #### GET_TRANSACTION_AUTHOR_AGREEMENT_AML
