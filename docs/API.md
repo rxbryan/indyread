@@ -453,4 +453,44 @@ This API provides endpoints for querying the indy ledger.
 #### GET_AUTH_RULE
 #### GET_TRANSACTION AUTHOR_AGREEMENT
 #### GET_TRANSACTION_AUTHOR_AGREEMENT_AML
+* **GET /api/networks/:networkRef/txs/taaa/**
+    * **Description:** Gets a transaction author agreement acceptance mechanisms list. Gets the latest (current) transaction author agreement acceptance mechanisms list if `version` or `timestamp` query parameter is not set.
+    * **Request Parameters:**
+        * `networkRef`: network id.
+    * **Request query:**
+        * `version`: (optional) Unique version of the transaction author agreement acceptance mechanisms list
+        * `timestamp`: (optional, integer as POSIX timestamp) The time when transaction author agreement acceptance mechanisms list has been ordered (written to the ledger).
+        * `reqId`: (required)
+        * `identifier`: (required)
+    * **Example**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK_2/txs/transaction-aaa/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&version=0.1
+    * **Response:**
+        * **JSON:**
+        ```json
+        {
+          "op": "REPLY",
+          "result": {
+            "data": {
+              "aml": {
+                "for_session": "The agreement was reviewed by the user and accepted at some point in the user’s session prior to submission.",
+                "on_file": "An authorized person accepted the agreement, and such acceptance is on file with the user’s organization.",
+                "wallet_agreement": "The agreement was reviewed by the user and this affirmation was persisted in the user’s wallet for use during future submissions."
+              },
+              "amlContext": "https://raw.githubusercontent.com/wiki/bcgov/bc-vcpedia/(Layer-1)-CANdy-Acceptance-Mechanism-List-(AML).md",
+              "version": "0.1"
+            },
+            "type": "7",
+            "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+            "reqId": "1514311352551755",
+            "version": "0.1",
+            "seqNo": 1,
+            "txnTime": 1665174209,
+            "state_proof": {
+
+            }
+          }
+        }
+        ```
+
 #### GET_CONTEXT

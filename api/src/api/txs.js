@@ -6,6 +6,7 @@ const Joi = require('joi')
 const { result } = require('lodash')
 const { data } = require('../logging/logger-main')
 const { type } = require('os')
+const { stringify } = require('querystring')
 
 function initTxsApi (app, networkManager, serviceTxs) {
   function getNetworkId (req, res) {
@@ -77,7 +78,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
     }))
 
   // GET_TXN
-  app.get('/api/networks/:networkRef/txs/:seqNo',
+  app.get('/api/networks/:networkRef/txs/seqno/:seqNo',
     validate(
       {
         query: Joi.object({
@@ -100,6 +101,7 @@ function initTxsApi (app, networkManager, serviceTxs) {
       
       const tx = await serviceTxs.getTx(networkId, subledger, parseInt(seqNo))
       const originalTx = JSON.parse(tx.idata.json)
+      console.log(JSON.stringify(originalTx, null, 2))
 
       res.status(200).send(
         buildResponse(
@@ -460,6 +462,49 @@ function initTxsApi (app, networkManager, serviceTxs) {
       }
 
       res.status(200).send(result)
+
+  }))
+
+    //GET_TRANSACTION_AUTHOR_AGREEMENT_AML
+    app.get('/api/networks/:networkRef/txs/transaction-aaa/',
+    validate(
+      {
+        query: Joi.object({
+          timestamp: Joi.string(),
+          version: Joi.string(),
+          reqId: Joi.string().required(),
+          identifier: Joi.string().required()
+        })
+      }
+    ),
+    asyncHandler(async function (req, res, next) {
+      const networkId = getNetworkId(req, res)
+      const { version, timestamp,  reqId, identifier } = req.query
+      
+      if (timestamp && version) {
+        next(new ValidationError("'timestamp' is mutually exclusive with 'version'"))
+      }
+      else {
+        const txs = await serviceTxs.getTxByType(networkId, 'config', {version, timestamp}, "TXN_AUTHOR_AGREEMENT_AML")
+
+        let originalTx = JSON.parse(txs[0].idata.serialized.idata.json)
+
+        const result = {
+          op: "REPLY",
+          result: {
+            data: originalTx.txn.data,
+            type: "7",
+            identifier,
+            reqId,
+            version: originalTx.txn.data.version,
+            seqNo: txs[0].imeta.seqNo,
+            txnTime: originalTx.txnMetadata.txnTime,
+            state_proof: {}
+          }
+        }
+
+        res.status(200).send(result)
+      }
 
   }))
 

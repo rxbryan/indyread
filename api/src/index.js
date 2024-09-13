@@ -14,7 +14,7 @@ var pretty = require('express-prettify')
 const { createServiceTxs } = require('./service/service-txs')
 app.use(pretty({ query: 'pretty' }))
 
-function setupLoggingMiddlleware (app, enableRequestLogging, enableResponseLogging) {
+function setupLoggingMiddleware (app, enableRequestLogging, enableResponseLogging) {
   if (enableRequestLogging) {
     app.use(logRequests)
   }
@@ -47,7 +47,7 @@ async function startServer () {
   const networkConfigManager = setupNetworkManager(networksConfig)
   const ledgerStorageManager = await setupStorageManager(networkConfigManager, appConfig.ES_URL)
   const serviceTxs = createServiceTxs(ledgerStorageManager)
-  setupLoggingMiddlleware(app, appConfig.LOG_HTTP_REQUESTS === 'true', appConfig.LOG_HTTP_RESPONSES === 'true')
+  setupLoggingMiddleware(app, appConfig.LOG_HTTP_REQUESTS === 'true', appConfig.LOG_HTTP_RESPONSES === 'true')
   initApiTxs(app, networkConfigManager, serviceTxs)
   initApiNetworks(app, networkConfigManager)
 

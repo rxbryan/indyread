@@ -14,7 +14,8 @@ const {
   esMatchSchemaVersion,
   esMatchSchemaRef,
   esMatchTxnId,
-  esMatchRevocRegDefId
+  esMatchRevocRegDefId,
+  esMatchTAAAVersion
 } = require('./es-query-builder')
 const util = require('util')
 
@@ -196,6 +197,39 @@ function createStorageReadEs (esClient, esIndex) {
     return tx
   }
 
+  async function getTAAA(subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = queries.timestamp
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT_AML"),
+        esMatchTxTime(queries.timestamp)
+      )
+    : queries.version
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT_AML"),
+        esMatchTAAAVersion(queries.version)
+      )
+    : esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT_AML")
+      );
+    
+      let sort = { 'imeta.seqNo': { order: 'asc' } }
+
+      const searchRequest = {
+        index: esIndex,
+        body: { query, sort }
+      }
+  
+      console.log(JSON.stringify(query))
+      const body = await executeEsSearch(searchRequest)
+      const fullTxs = body.hits.hits.map(h => h._source)
+      //console.log(JSON.stringify(fullTxs))
+      return fullTxs
+  }
+
   /*
   Returns array of (by default all) transactions.
   By default are transactions sorted from the latest (index 0) to the oldest (last index of result array)
@@ -247,6 +281,7 @@ function createStorageReadEs (esClient, esIndex) {
     getClaimDef,
     getRevocRegDef,
     getRevocReg,
+    getTAAA,
     getManyTxs,
     getTxCount
   }
