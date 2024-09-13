@@ -63,6 +63,8 @@ function createServiceTxs (ledgerStorageManager) {
         return storage.getRevocReg(subledger, query)
       case "TXN_AUTHOR_AGREEMENT_AML":
         return storage.getTAAA(subledger, query)
+      case "TXN_AUTHOR_AGREEMENT":
+        return storage.getTAA(subledger, query)
       default:
         return {}
     }

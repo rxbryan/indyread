@@ -15,7 +15,8 @@ const {
   esMatchSchemaRef,
   esMatchTxnId,
   esMatchRevocRegDefId,
-  esMatchTAAAVersion
+  esMatchTAAAVersion,
+  esMatchTAADigest
 } = require('./es-query-builder')
 const util = require('util')
 
@@ -216,7 +217,46 @@ function createStorageReadEs (esClient, esIndex) {
         esMatchTxType("TXN_AUTHOR_AGREEMENT_AML")
       );
     
-      let sort = { 'imeta.seqNo': { order: 'asc' } }
+      let sort = { 'imeta.seqNo': { order: 'desc' } }
+
+      const searchRequest = {
+        index: esIndex,
+        body: { query, sort }
+      }
+  
+      console.log(JSON.stringify(query))
+      const body = await executeEsSearch(searchRequest)
+      const fullTxs = body.hits.hits.map(h => h._source)
+      //console.log(JSON.stringify(fullTxs))
+      return fullTxs
+  }
+
+  async function getTAA(subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = queries.timestamp
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT"),
+        esMatchTxTime(queries.timestamp)
+      )
+    : queries.version
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT"),
+        esMatchTAAAVersion(queries.version)
+      )
+    : queries.digest
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT"),
+        esMatchTAADigest(queries.digest)
+      )
+    : esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("TXN_AUTHOR_AGREEMENT")
+      );
+    
+      let sort = { 'imeta.seqNo': { order: 'desc' } }
 
       const searchRequest = {
         index: esIndex,
@@ -282,6 +322,7 @@ function createStorageReadEs (esClient, esIndex) {
     getRevocRegDef,
     getRevocReg,
     getTAAA,
+    getTAA,
     getManyTxs,
     getTxCount
   }

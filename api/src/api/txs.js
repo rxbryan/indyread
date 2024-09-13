@@ -465,8 +465,8 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
   }))
 
-    //GET_TRANSACTION_AUTHOR_AGREEMENT_AML
-    app.get('/api/networks/:networkRef/txs/transaction-aaa/',
+  //GET_TRANSACTION_AUTHOR_AGREEMENT_AML
+  app.get('/api/networks/:networkRef/txs/taaa/',
     validate(
       {
         query: Joi.object({
@@ -507,6 +507,50 @@ function initTxsApi (app, networkManager, serviceTxs) {
       }
 
   }))
+
+    //GET_TRANSACTION_AUTHOR_AGREEMENT
+    app.get('/api/networks/:networkRef/txs/txaa/',
+      validate(
+        {
+          query: Joi.object({
+            digest: Joi.string(),
+            timestamp: Joi.string(),
+            version: Joi.string(),
+            reqId: Joi.string().required(),
+            identifier: Joi.string().required()
+          })
+        }
+      ),
+      asyncHandler(async function (req, res, next) {
+        const networkId = getNetworkId(req, res)
+        const { version, timestamp, digest, reqId, identifier } = req.query
+        
+        if ((version && timestamp) || (version && digest) || (timestamp && digest)) {
+          next(new ValidationError("query paramters 'timestamp', 'version' and 'digest' are mutually exclusive"))
+        }
+        else {
+          const txs = await serviceTxs.getTxByType(networkId, 'config', {version, digest, timestamp}, "TXN_AUTHOR_AGREEMENT")
+  
+          let originalTx = JSON.parse(txs[0].idata.serialized.idata.json)
+  
+          const result = {
+            op: "REPLY",
+            result: {
+              data: originalTx.txn.data,
+              type: "6",
+              identifier,
+              reqId,
+              version: originalTx.txn.data.version,
+              seqNo: txs[0].imeta.seqNo,
+              txnTime: originalTx.txnMetadata.txnTime,
+              state_proof: {}
+            }
+          }
+  
+          res.status(200).send(result)
+        }
+  
+    }))
 
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
     validate(
