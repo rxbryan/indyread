@@ -10,7 +10,6 @@ async function importIndex(esClient, esIndex, path_str) {
   const knownSubledgers = Object.values(SUBLEDGERS)
   
   const outputFormat = 'serialized'
-  const InputFormat = 'original'
   const elasticsearchTargetMappings = {
       json: { type: 'text', index: false }
     }
@@ -22,14 +21,11 @@ async function importIndex(esClient, esIndex, path_str) {
       const txfile = `${esIndex}_${subledger}.json`
       const filePath = path.join(path_str, txfile)
 
-      let docCount = 0
-
       const docs = fs.readFileSync(filePath)
       
       esClient.helpers.bulk({
         datasource: JSON.parse(docs),
         onDocument (doc) {
-          docCount++
           console.log(`upserting ${JSON.stringify(doc.imeta)}`)
           return [
             { update: { _index: esIndex, _id: `${subledger}-${doc.imeta.seqNo}` } },
@@ -37,8 +33,6 @@ async function importIndex(esClient, esIndex, path_str) {
           ]
         }
       })
-
-      console.log(`Upserted ${docCount} ${subledger} txs in ${esIndex} index`)
 
     })
   }
