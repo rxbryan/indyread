@@ -48,6 +48,7 @@ async function createStorageWriteEs (esClient, esIndex, esReplicaCount, logger =
     esMappingDefinition.properties['idata.expansion.idata.txn.data.dest'] = { type: 'keyword' }
     esMappingDefinition.properties['idata.expansion.idata.txn.data.raw'] = { type: 'keyword' }
     esMappingDefinition.properties['idata.expansion.idata.txn.metadata.from'] = { type: 'keyword' }
+    esMappingDefinition.properties['idata.expansion.idata.txn.metadata.digest'] = { type: 'keyword' }
     esMappingDefinition.properties['idata.expansion.idata.txn.data.data.name'] = { type: 'keyword' }
     esMappingDefinition.properties['idata.expansion.idata.txn.data.data.version'] = { type: 'keyword' }
     esMappingDefinition.properties['idata.expansion.idata.txnMetadata.txnId'] = { type: 'keyword' }
