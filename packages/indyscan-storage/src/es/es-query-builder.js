@@ -57,6 +57,14 @@ function esMatchSchemaVersion(version) {
   }
 }
 
+function esMatchTAAAVersion(version) {
+  return {
+    match: {
+      "idata.expansion.idata.txn.data.version": version
+    }
+  }
+}
+
 function esMatchSchemaRef(ref) {
   return {
     term: {
@@ -216,6 +224,7 @@ module.exports.esMatchSchemaName = esMatchSchemaName
 module.exports.esMatchSchemaVersion = esMatchSchemaVersion
 module.exports.esMatchSchemaRef = esMatchSchemaRef
 module.exports.esMatchTxnId = esMatchTxnId
+module.exports.esMatchTAAAVersion = esMatchTAAAVersion
 module.exports.esMatchRevocRegDefId = esMatchRevocRegDefId
 module.exports.esMatchTxTime = esMatchTxTime
 module.exports.esFilterTxnAfterTime = esFilterTxnAfterTime

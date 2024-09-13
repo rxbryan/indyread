@@ -16,5 +16,23 @@
     "es" : {
       "index": "txs-bcovdev"
     }
-  }
+  },
+  {
+    "id": "TEST_NETWORK_2",
+    "ui": {
+      "priority": 1,
+      "display": "",
+      "display-long": "",
+      "description": "For active development of indyread.",
+      "tutorial": "Get your DID and start writing on the network",
+      "tutorial-link": "",
+      "logo-address": ""
+    },
+    "aliases": [
+      ""
+    ],
+    "es" : {
+      "index": "txs-candyprod"
+    }
+  } 
 ]
