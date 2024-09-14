@@ -65,6 +65,8 @@ function createServiceTxs (ledgerStorageManager) {
         return storage.getTAAA(subledger, query)
       case "TXN_AUTHOR_AGREEMENT":
         return storage.getTAA(subledger, query)
+      case "AUTH_RULE":
+        return storage.getAuthRule(subledger, query)
       default:
         return {}
     }

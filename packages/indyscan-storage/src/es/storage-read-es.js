@@ -16,7 +16,8 @@ const {
   esMatchTxnId,
   esMatchRevocRegDefId,
   esMatchTAAAVersion,
-  esMatchTAADigest
+  esMatchTAADigest,
+  esMatchAuthRuleParams
 } = require('./es-query-builder')
 const util = require('util')
 
@@ -116,6 +117,11 @@ function createStorageReadEs (esClient, esIndex) {
     }
 
     const body = await executeEsSearch(searchRequest)
+    // Get all txs if hits > 10
+    if (body.hits.total.value > body.hits.hits.length) {
+      searchRequest.body.size = body.hits.total.value
+      body = await executeEsSearch(searchRequest)
+    }
     const fullTxs = body.hits.hits.map(h => h._source)
     return fullTxs
   }
@@ -139,8 +145,12 @@ function createStorageReadEs (esClient, esIndex) {
 
     console.log(JSON.stringify(query))
     const body = await executeEsSearch(searchRequest)
+    // Get all txs if hits > 10
+    if (body.hits.total.value > body.hits.hits.length) {
+      searchRequest.body.size = body.hits.total.value
+      body = await executeEsSearch(searchRequest)
+    }
     const fullTxs = body.hits.hits.map(h => h._source)
-    //console.log(JSON.stringify(fullTxs))
     return fullTxs
   }
 
@@ -226,8 +236,12 @@ function createStorageReadEs (esClient, esIndex) {
   
       console.log(JSON.stringify(query))
       const body = await executeEsSearch(searchRequest)
+      // Get all txs if hits > 10
+      if (body.hits.total.value > body.hits.hits.length) {
+        searchRequest.body.size = body.hits.total.value
+        body = await executeEsSearch(searchRequest)
+      }
       const fullTxs = body.hits.hits.map(h => h._source)
-      //console.log(JSON.stringify(fullTxs))
       return fullTxs
   }
 
@@ -265,8 +279,50 @@ function createStorageReadEs (esClient, esIndex) {
   
       console.log(JSON.stringify(query))
       const body = await executeEsSearch(searchRequest)
+      // Get all txs if hits > 10
+      if (body.hits.total.value > body.hits.hits.length) {
+        searchRequest.body.size = body.hits.total.value
+        body = await executeEsSearch(searchRequest)
+      }
       const fullTxs = body.hits.hits.map(h => h._source)
-      //console.log(JSON.stringify(fullTxs))
+      return fullTxs
+  }
+
+  async function getAuthRule(subledger, queries) {
+    const subledgerTxsQuery = createSubledgerQuery(subledger)
+    const query = queries.auth_action
+    ? esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("AUTH_RULE"),
+        esMatchAuthRuleParams(
+          queries.auth_action,
+          queries.auth_type,
+          queries.field,
+          queries.new_value,
+          queries.old_value || null
+        )
+      )
+    : esAndFilters(
+        subledgerTxsQuery,
+        esMatchTxType("AUTH_RULE")
+      );
+    
+      let sort = { 'imeta.seqNo': { order: 'desc' } }
+
+      const searchRequest = {
+        index: esIndex,
+        body: { query, sort }
+      }
+  
+      console.log(JSON.stringify(query))
+      let body = await executeEsSearch(searchRequest)
+
+      // Get all txs if hits > 10
+      if (body.hits.total.value > body.hits.hits.length) {
+        searchRequest.body.size = body.hits.total.value
+        body = await executeEsSearch(searchRequest)
+      }
+      const fullTxs = body.hits.hits.map(h => h._source)
       return fullTxs
   }
 
@@ -323,6 +379,7 @@ function createStorageReadEs (esClient, esIndex) {
     getRevocReg,
     getTAAA,
     getTAA,
+    getAuthRule,
     getManyTxs,
     getTxCount
   }

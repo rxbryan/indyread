@@ -278,8 +278,6 @@ function initTxsApi (app, networkManager, serviceTxs) {
 
       let originalTx = JSON.parse(tx.idata.serialized.idata.json)
 
-      console.log(JSON.stringify(originalTx.txn.data, null, 2))
-      console.log(tag, originalTx.txn.data.tag)
       const result = tag !==  originalTx.txn.data.tag ? {} : {
         op: "REPLY",
         result: {
@@ -550,6 +548,88 @@ function initTxsApi (app, networkManager, serviceTxs) {
           res.status(200).send(result)
         }
   
+    }))
+
+    //GET_AUTH_RULE
+    app.get('/api/networks/:networkRef/txs/auth-rule/',
+      validate(
+        {
+          query: Joi.object({
+            auth_action: Joi.string(),
+            auth_type: Joi.string(),
+            field: Joi.string(),
+            old_value: Joi.string(),
+            new_value: Joi.string(),
+            reqId: Joi.string().required(),
+            identifier: Joi.string().required()
+          })
+        }
+      ),
+      asyncHandler(async function (req, res, next) {
+        const networkId = getNetworkId(req, res)
+        const {
+          auth_action,
+          auth_type,
+          field,
+          old_value,
+          new_value,
+          reqId,
+          identifier
+        } = req.query
+        
+        const inclusive_params = [
+          auth_action,
+          auth_type,
+          field,
+          new_value
+        ].filter(param => typeof param !== 'undefined');
+
+        // If any of the query params is defined, all must be defined.
+        // `old_value` is optional
+        if (inclusive_params.length > 0 && inclusive_params.length !== 4) {
+          next(
+            {
+              message: '`auth_action`, `auth_type`, `field`,`new_value` '+
+              'query params must be defined if any one of them is defined.'});
+        }
+        else {
+          const txs = await serviceTxs.getTxByType(
+            networkId,
+            'config',
+            {
+              auth_action,
+              auth_type,
+              field,
+              old_value,
+              new_value,
+              reqId,
+              identifier
+            },
+            "AUTH_RULE"
+          )
+
+          const result = {
+            op: "REPLY",
+            result: {
+              data: txs.map(
+                (tx) => {
+                  return tx.idata.expansion.idata.txn.data
+                }
+              ),
+              type: "121",
+              identifier,
+              reqId,
+              auth_type,
+              auth_action,
+              field,
+              old_value,
+              new_value,
+              state_proof: {}
+            }
+          }
+
+          res.status(200).send(result)
+        }
     }))
 
   app.get('/api/networks/:networkRef/ledgers/:ledger/txs/stats/count',
