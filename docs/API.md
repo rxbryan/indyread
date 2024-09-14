@@ -35,7 +35,7 @@ This API provides endpoints for querying the indy ledger.
 
 #### GET_TXN
 
-* **GET /api/networks/:networkRef/txs/:seqNo**
+* **GET /api/networks/:networkRef/txs/seqno/:seqNo**
     * **Description:** Retrieve a transaction by id or seqno.
     * **Request Parameters:**
         * `networkRef`: network id.
@@ -451,6 +451,137 @@ This API provides endpoints for querying the indy ledger.
 
 
 #### GET_AUTH_RULE
+* **GET /api/networks/:networkRef/txs/auth-rule/**
+    * **Description:** Gets a Revocation Registry Delta (accum values, and delta of issues/revoked indices) for the given time interval (from and to).
+    * **Request Parameters:**
+        * `networkRef`: network id.
+        * `revocRegDefId`: The corresponding Revocation Registry Definition’s unique identifier (txid).
+    * **Request query:**
+        * `auth_action` (enum: ADD or EDIT; optional): Action type: add a new entity or edit an existing one.
+
+        * `auth_type` (string; optional): The type of transaction to change rights for. (Example: “0”, “1”, …)
+
+        * `field` (string; optional): Change the rights for editing (adding) a value of the given transaction field. * can be used as any field.
+
+        * `old_value` (string; optional): Old value of a field, which can be changed to a new_value. Makes sense for EDIT actions only.
+
+        * `new_value` (string; optional): New value that can be used to fill the field.
+        * `reqId`: (required)
+        * `identifier`: (required)
+    * **Example**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK_2/txs/auth-rule/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&auth_type=1&field=role&auth_action=ADD&new_value=2
+        ```
+    * **Response:**
+        * **JSON:**
+        ```json
+          {
+            "op": "REPLY",
+            "result": {
+              "data": [
+                {
+                  "auth_type": "1",
+                  "field": "role",
+                  "auth_action": "ADD",
+                  "constraint": {
+                    "need_to_be_owner": false,
+                    "role": "0",
+                    "constraint_id": "ROLE",
+                    "sig_count": 2
+                  },
+                  "new_value": "2"
+                }
+              ],
+              "type": "121",
+              "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+              "reqId": "1514311352551755",
+              "auth_type": "1",
+              "auth_action": "ADD",
+              "field": "role",
+              "new_value": "2",
+              "state_proof": {
+
+              }
+            }
+          }
+        ```
+
+    * **Example 2**
+        ```sh
+          curl http://0.0.0.0:3708/api/networks/TEST_NETWORK_2/txs/auth-rule/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb
+        ```
+    * **Response:**
+        * **JSON:**
+        ```json
+            {
+              "op": "REPLY",
+              "result": {
+                "data": [
+                  {
+                    "auth_type": "1",
+                    "field": "role",
+                    "auth_action": "ADD",
+                    "constraint": {
+                      "need_to_be_owner": false,
+                      "role": "0",
+                      "constraint_id": "ROLE",
+                      "sig_count": 1
+                    },
+                    "new_value": "201"
+                  },
+                  {
+                    "auth_type": "113",
+                    "field": "*",
+                    "auth_action": "EDIT",
+                    "constraint": {
+                      "need_to_be_owner": true,
+                      "role": "*",
+                      "constraint_id": "ROLE",
+                      "sig_count": 1
+                    },
+                    "old_value": "*",
+                    "new_value": "*"
+                  },
+                  {
+                    "auth_type": "119",
+                    "field": "*",
+                    "auth_action": "ADD",
+                    "constraint": {
+                      "auth_constraints": [
+                        {
+                          "need_to_be_owner": false,
+                          "role": "0",
+                          "constraint_id": "ROLE",
+                          "sig_count": 1
+                        },
+                        {
+                          "need_to_be_owner": false,
+                          "role": "2",
+                          "constraint_id": "ROLE",
+                          "sig_count": 1
+                        },
+                        {
+                          "need_to_be_owner": false,
+                          "role": "201",
+                          "constraint_id": "ROLE",
+                          "sig_count": 1
+                        }
+                      ],
+                      "constraint_id": "OR"
+                    },
+                    "new_value": "*"
+                  },
+                  ...
+                ],
+                "type": "121",
+                "identifier": "MSjKTWkPLtYoPEaTF1TUDb",
+                "reqId": "1514311352551755",
+                "state_proof": {
+
+                }
+              }
+            }
+        ```
 #### GET_TRANSACTION AUTHOR_AGREEMENT
 * **GET /api/networks/:networkRef/txs/taaa/**
     * **Description:** Gets a transaction author agreement. Gets the latest (current) transaction author agreement if `version` or `timestamp` or `digest` query parameter is not set.
@@ -474,7 +605,7 @@ This API provides endpoints for querying the indy ledger.
             "result": {
               "data": {
                 "ratification_ts": 1660068300,
-                "text": "# Transaction Author Agreement V0.1\n\n\n## Summary:\n\n\nThis summary is provided to help you understand your obligations when writing to\nthe CANdy Ledger Networks-it does not have any legal effect or replace the full\nlegal text of the agreement provided below it.\n\n\n- This agreement grants you permission to write data to the CANdy Ledger\n  Networks under certain terms and conditions.\n\n\n- You represent and warrant that the data you are writing does not violate any\n  applicable laws or infringe the rights of any other party.\n\n\n- You understand the data you are writing is public and permanent and there can\n  be no guarantee of erasure. This includes public keys and payment addresses.\n\n\n- If it is determined that the data you wrote violated this agreement, the\n  operators of the network can take steps to block it from public access.\n\n\n- The CANdy Network makes no promises about the reliability or correctness\n  of the data being stored on the CANdy Ledger Networks or the operation of the\n  CANdy Ledger Networks.\n\n\n--------------------------------------------------------------------------------\n\n\n## Agreement: pending provisional approval by CANdy Board\n\n\nThis Transaction Author Agreement (the \"**Agreement**\") is entered into on the\ndate you accepted this Agreement (the \"**Effective Date**\") between the CANdy Network and you\n(\"**Transaction Author**\"), either an entity or a natural person acting as\nan Individual. The CANdy Network and Transaction Author are individually\nreferred to herein as a  \"Party\" and collectively as the  \"Parties\". All\nreferences to \"you\" throughout this Agreement will include that person or\nentity. You represent that you are authorized to accept this Agreement on that\nperson’s or entity’s behalf, and in the event you or the person or entity\nviolates this Agreement, the person or entity agrees to be responsible to the\nCANdy Network.\n\n\nBy clicking \"Accept\" or similar or writing Transactions to the CANdy Ledger\nNetworks, Transaction Author agrees to be bound by this Agreement and all terms\nincorporated by reference. If Transaction Author does not agree to this\nAgreement in its entirety, do not click \"Accept\" or write Transactions to the\nCANdyLedger Networks.\n\n\nIf the CANdy Network makes material changes to this Agreement, the CANdy Network will notify you\nby posting a notice on GitHub prior to the effective date of the changes. \nBy continuing to act as a Transaction Author or by otherwise writing Transactions on the\nCANdy Ledger Networks after the CANdy Network posts changes to GitHub you agree to be\nbound by the revised Agreement.\n\n\nWHEREAS, Transaction Author desires to write Transactions to the CANdy\nLedger Networks (each a \"**Transaction**\"); and\n\n\nWHEREAS, subject to Transaction Author complying with the terms and\nconditions of this Agreement, the CANdy Network grants permission to \nTransaction Author to write Transactions to the CANdy Ledger Networks;\n\n\nFOR GOOD AND VALUABLE CONSIDERATION, THE SUFFICIENCY OF WHICH IS HEREBY\nACKNOWLEDGED, THE PARTIES AGREE AS FOLLOWS:\n\n\n\n\n## 1) Definitions\n\n\na. \"**Data Protection Laws**\" means the data protection and\nprivacy laws, regulations, and regulatory requirements applicable to a party\nunder this Agreement.\n\n\nb. \"**Impermissible Personal Data**\" means the Personal Data that\nTransaction Author writes to the CANdy Ledger Networks that is not\nPermissible Personal Data.\n\n\nc. \"**Personal Data Transactions**\" has the meaning set forth in Section 3\nbelow.\n\n\nd. \"**Permissible Personal Data**\" means Personal Data that Transaction\nAuthor writes to the CANdy Ledger Networks that is permitted under this\nAgreement and the CANdy Governance Framework.\n\n\ne. \"**Personal Data**\" means information that relates, directly or\nindirectly, to a data subject, including without limitation, names, email\naddresses, postal addresses, identification numbers, location data, online\nidentifiers or one or more factors specific to the physical, physiological,\ngenetic, mental, economic, cultural or social identity of the data subject.\n\n\nf. \"**Process**\" or \"**Processing**\" means any operation or set of\noperations which is performed on Transactions data, whether or not by\nautomated means, such as the access, collection, use, storage, disclosure,\ndissemination, combination, recording, organization, structuring, adaption,\nalteration, copying, transfer, retrieval, consultation, disposal, restriction,\nerasure and/or destruction of Transactions data.\n\n\ng. \"**CANdy Governance Framework**\" means the CANdy Network's \ngovernance policies and rules available at\nhttps://github.com/bcgov/bc-vcpedia/wiki/(Layer-1)-CANdy-Utility-Provisional-Governance-Framework\n\n\nUnless otherwise defined above, all capitalized terms used in this Agreement\nshall have the meanings given to them in this Agreement or in the CANdy\nGovernance Framework. The CANdy Governance\nFramework is incorporated into this Agreement by reference\nonly for purposes of use of such defined terms.\n\n\n\n\n## 2) Permission to Write to the CANdy Ledger Networks\n\n\na. The CANdy Network hereby grants to Transaction Author a non-exclusive,\nnon-assignable, non-sublicensable, royalty free, revocable license to write to\nand use the CANdy Ledger Networks in accordance with this Agreement and the\nCANdy Governance Framework.\n\n\nb. When authoring Transactions under the policy of Permissioned Write Access,\na Transaction Author may only write to the CANdy Ledger Networks by using an\nauthorized Transaction Endorser. In the event that the CANdy Network enables\nPublic Write Access to the CANdy Ledger Networks, Transaction Author will\nnot need a Transaction Endorser to endorse a Transaction.\n\n\nc. Once an initial Transaction has been written to one of the CANdy Ledger\nNetworks by Transaction Author (\"**Initial Transaction**\"), the\nTransaction Author is granted permission to make additional Transactions to\nupdate the state of a previous Transaction (\"**Update Transactions**\"). Please\nnote, an Update Transaction does not remove the Initial Transaction, which\nwill remain on the CANdy Ledger due to its immutability and may remain on\nCANdy Test Networks unless they are reset. Transaction Author may make Update\nTransactions if and only if Transaction Author was the author of the\nInitial Transaction. Update Transactions are Transactions and are subject to\nall the terms of this Agreement.\n\n\n\n\n## 3) Transaction Author Obligations\n\n\na. With regard to all Transactions, Transaction Author will:\n\n\n  1. comply with any requirements imposed by the Transaction Endorser on the\n  Transaction Author and any Transactions endorsed by the Transaction\n  Endorser;\n\n\n  2. not write Transactions containing Personal Data until the CANdy Network\n  approves Public Write Access and permits Transactions to contain Personal\n  Data pursuant to Section 3(b) below.\n\n\nb. If the CANdy Network approves Public Write Access and permits\nTransaction Authors to write Transactions that contain Permissible Personal\nData (\"**Personal Data Transactions**\"), then Transaction Author expressly\nagrees that:\n\n\n  1. It will not write any Transactions that contain Impermissible Personal\n  Data to the CANdy Ledger Networks;\n\n\n  2. it is an independent data controller of the\n  Personal Data Transactions and will be responsible for the lawfulness of the\n  Processing of such data in compliance with the Data Protection Laws;\n\n\n  3. it acknowledges and will notify all data subjects whose Personal Data it\n  Processes that functions inherent in blockchain technology may render\n  fulfilling data subject requests difficult or impossible. For example, due\n  to blockchain’s immutability, data stored on a blockchain generally cannot\n  be removed or altered once the data is confirmed on the blockchain;\n\n\n  4. it irrevocably waives any and all claims, rights and/or obligations it\n  may have now or in the future against the CANdy Network as a result of\n  being unable to fulfill data subject requests in accordance with Data\n  Protection Laws;\n\n\n  5. that the CANdy Network has the right to enter into the DPAs on its\n  behalf and the DPAs are made a part of the Agreement in their entirety;\n\n\n  6. by signing this Agreement, each Party is deemed to have signed the DPAs,\n  including the Standard Contractual Clauses with the CANdy Network and\n  Transaction Author as the \"Data exporter\", and with either a Steward or a\n  Transaction Endorser as \"Data importer\", as applicable;\n\n\n  7. at the CANdy Network's request, Transaction Author will reimburse\n  the CANdy for any costs incurred by the CANdy Network in\n  enforcing Transaction Author’s rights, including but not\n  limited to fulfillment of data subject rights, rights of oversight and\n  audit, etc.; and\n\n\n  8. it irrevocably waives any and all claims that it may have now or in the\n  future that the CANdy Network lacks the rights to enter into the DPAs on\n  its behalf and bind Transaction Author to the DPAs’ terms and conditions,\n  including the limitation of liability therein.\n\n\n\n\n\n\n## 4) Representations and Warranties; Disclaimer\n\n\na. By the CANdy Network.\n\n\n  1. THE CANDY LEDGER NETWORKS AND THE CANDY NETWORK ARE PROVIDED AS-IS WITH\n  ALL FAULTS. TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THE CANDY\n  NETWORK MAKES NO REPRESENTATION OR WARRANTY CONCERNING THE ACCURACY,\n  RELIABILITY, OR COMPLETENESS OF ANY INFORMATION OR DATA OBTAINED OR DERIVED\n  THROUGH THE USE OF THE CANDY LEDGER NETWORKS AS THE CANDY LEDGER NETWORKS\n  OPERATE ON A DISTRIBUTED NETWORK AND THE CANDY NETWORK DOES NOT CONTROL\n  THE INFORMATION OR DATA WRITTEN TO THE CANDY LEDGER NETWORKS. THE CANDY DISCLAIMS ANY OTHER REPRESENTATIONS OR WARRANTIES, EXPRESS OR\n  IMPLIED, INCLUDING WITHOUT LIMITATION, ANY WARRANTIES OF MERCHANTABILITY OR\n  FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY OR\n  COMPLETENESS OF DATA.\n\n\n  2. As the architect of the CANdy Network and administrator of the CANdy\n  Governance Framework, the CANdy Network is an independent controller of\n  the Personal Data Transactions. In no event will the CANdy Network be\n  held liable for the actions or omissions of Transaction Author arising out\n  any Personal Data that Transaction Author writes to the CANdy Ledger\n  Networks in breach of this Agreement and the CANdy Governance Framework,\n  including but not limited to any Impermissible Personal Data.\n  Notwithstanding the foregoing, if Transaction Author writes Permissible\n  Personal Data to the CANdy Ledger Networks in express compliance with this\n  Agreement and the CANdy Governance Framework, the CANdy Network is\n  responsible for the lawfulness of such Processing once such Permissible\n  Personal Data is written to the CANdy Ledger Networks.\n\n\nb. By Transaction Author. Transaction Author represents and warrants:\n\n\n  1. if a natural person, he or she is 16 years of age or older;\n\n\n  2. it has all necessary rights and permissions to write the Transactions;\n\n\n  3. the Transactions do not and will not violate any applicable law;\n\n\n  4. the Transactions will not contain data or information that infringes or\n  misappropriates the intellectual property rights of any third party;\n\n\n  5. it understands that the CANdy Ledger Networks operate on a distributed\n  network and that the CANdy Network disclaims any responsibilities with\n  respect to access of data from the CANdy Ledger Networks;\n\n\n  6. it understands and acknowledges that the CANdy Network does not control the\n  transfer of data between Nodes and over communications facilities,\n  including the internet, and that the CANdy Ledger Networks may be subject\n  to limitations, delays, and other problems inherent in the use of such\n  communications facilities;\n\n\n  7. it understands and acknowledges that there is regulatory uncertainty\n  regarding the CANdy Ledger Networks’ compliance with Data Protection Laws\n  as it relates to Permissioned Write Access, Public Write Access, and\n  Personal Data, including cross-border transfers of data, Processing of\n  Personal Data, the right to effective erasure of data, as well as the scope\n  and nature of Personal Data itself;\n\n\n  8. it understands and acknowledges that the CANdy Network may modify, at any\n  time, its CANdy Ledger Access Policies and the terms of this Agreement and\n  any other agreement or document related to the CANdy Ledger Networks based\n  on new information, guidance, or Data Protection Laws; and\n\n\n  9. it understands and acknowledges that a Steward and/or the CANdy Network\n  may obscure a Transaction if (i) the Steward or the CANdy Network is\n  required to do so by a court order or applicable law or (ii) the Steward or\n  the CANdy Network has evidence that the Transaction violates the terms of\n  this Agreement or any applicable law.\n\n\n\n\n## 5) Indemnification\n\n\na. To the fullest extent permitted by applicable law, Transaction Author will\nindemnify and hold harmless the CANdy Network, and each of its respective\nofficers, directors, agents, partners and employees (individually and\ncollectively, the \"**CANdy Parties**\") from and against any losses,\nliabilities, claims, demands, damages, expenses or costs (\"**Claims**\")\nbrought by a third party arising out of or related to (i) Transaction Author’s\naccess to or use of the CANdy Ledger Networks in violation of this Agreement;\n(ii) Transaction Author’s violation, misappropriation or infringement of any\nrights of another (including intellectual property rights or privacy rights);\nor (iii) Transaction Author’s violation of applicable law.\n\n\nb. Transaction Author agrees to promptly notify the CANdy Parties in writing\nof any Claims, cooperate with the CANdy Parties in defending such Claims and\npay all fees, costs and expenses associated with defending such Claims\n(including attorneys’ fees). Transaction Author also agrees that the CANdy \nParties will have sole control of the defense or settlement, at the CANdy\nNetwork’s sole option, of any Claims. This indemnity is in addition to, and\nnot in lieu of, any other indemnities set forth in a written agreement between\nTransaction Author and the CANdy Network or the other CANdy Parties.\n\n\n\n\n## 6) Governing Law and Forum\n\n\nThis Agreement is governed by the law of Canada, without\nreference to conflict of laws principles; provided that, if Transaction Author\nis a governmental entity, this Agreement is governed by the law in which such\ngovernmental entity is established. \n\n\n\n## 7) Limitation of Liability\n\n\nEXCEPT IN THE EVENT OF EITHER PARTY’S GROSS NEGLIGENCE, WILLFUL MISCONDUCT OR\nFRAUD, IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL,\nEXEMPLARY, PUNITIVE, SPECIAL, OR OTHER CONSEQUENTIAL DAMAGES UNDER THIS\nAGREEMENT, INCLUDING, WITHOUT LIMITATION, ANY LOST PROFITS, BUSINESS\nINTERRUPTION, LOSS OF PROGRAMS OR DATA, OR OTHERWISE, EVEN IF THE OTHER PARTY IS\nEXPRESSLY ADVISED OF THE POSSIBILITY OR LIKELIHOOD OF SUCH DAMAGES. EXCEPT IN\nTHE EVENT OF EITHER PARTY’S GROSS NEGLIGENCE, WILLFUL MISCONDUCT OR FRAUD, IN NO\nEVENT SHALL EITHER PARTY’S LIABILITY UNDER THIS AGREEMENT EXCEED $250,000 CAD IN\nTHE AGGREGATE, PROVIDED THAT THERE WILL BE NO DOLLAR CAP ON LIABILITY FOR\nDAMAGES ARISING FROM VIOLATIONS OF DATA PROTECTION LAWS. IN THE EVENT OF EITHER\nPARTY’S GROSS NEGLIGENCE, SUCH PARTY’S LIABILITY UNDER THIS AGREEMENT SHALL NOT\nEXCEED $500,000 CAD IN THE AGGREGATE. IN THE EVENT OF EITHER PARTY’S WILLFUL\nMISCONDUCT OR FRAUD, THERE SHALL BE NO DOLLAR CAP ON SUCH PARTY’S LIABILITY\nUNDER THIS AGREEMENT.\n\n\n\n\n## 8) Miscellaneous\n\n\na. Notice. Any notice, payment, demand or communication required or permitted\nto be delivered or given by the provisions of this Agreement shall be deemed\nto have been effectively delivered or given and received on the date\npersonally or electronically delivered to the respective Party to whom it is\ndirected, or when deposited by registered or certified mail, with postage and\ncharges prepaid and addressed to each respective Party. For the Transaction\nAuthor, notices will be sent to the agent service endpoint of the Transaction\nAuthor’s DID as long as Transaction Author authorizes such a connection or\nsent via other mechanism agreed to by the parties. \n\n\nb. Severability. If any provision of this Agreement is held invalid, illegal,\nor unenforceable, the validity, legality, and enforceability of any of the\nremaining provisions of this Agreement shall not in any way be affected or\nimpaired.\n\n\nc. Relationship of the Parties. This Agreement does not create a partnership,\nfranchise, joint venture, agency, fiduciary or employment relationship between\nthe Parties. Neither Party will represent that it has any authority to assume\nor create any obligation, express or implied, on behalf of the other Party,\nnor to represent the other Party as agent, employee, franchisee, or in any\nother capacity. There are no third-party beneficiaries to this Agreement.\nNeither Party shall make any proposals, promises, warranties, guarantees, or\nrepresentations on behalf of the other Party or in the other Party’s name.\n\n\nd. Assignment. Neither Party will voluntarily, or by operation of law, assign\nor otherwise transfer this Agreement without the other Party’s express prior\nwritten consent which will not be unreasonably withheld, provided that no such\nconsent is required for an assignment or transfer to a wholly or majority\nowned subsidiary or to a successor in interest by reason of merger or\nconsolidation or sale of all or substantially all of the assets of such Party\nrelating to the subject matter of this Agreement.\n\n\ne. Waiver. The waiver by either Party of a breach, default, delay or omission\nof any of the provisions of this Agreement by the other Party will not be\nconstrued as a waiver of any subsequent breach of the same or other\nprovisions.\n\n\nf. Entire Agreement. This Agreement, including all documents incorporated into\nthis Agreement by reference, constitutes the entire agreement of the Parties\nwith respect to the subject matter of this Agreement, and supersedes any and\nall prior agreements and understandings of the Parties, whether written or\noral, with respect to such subject matter. This Agreement supersedes all prior\nTransaction Author Agreements between The CANdy Network and Transaction Author\nwith respect to the subject matter hereof.\n\n\ng. Modification of This Agreement. The CANdy Network reserves the right to\nmodify this Agreement at any time in accordance with this provision,\nincluding, but not limited to, changes in applicable law or guidance from any\njurisdiction. The CANdy Network will post an amended version of this Agreement\non its website at least forty-five (45) days prior to the date on which all\nTransaction Authors must begin operating under the amendment (the \"**Amendment\nCutover Date**\"). If Transaction Author continues to Author Transactions to\nthe CANdy Ledger Networks after the Amendment Cutover Date, such continued\nuse will constitute acceptance of the amended Agreement.\n\n\nh. Counterparts. This Agreement may be executed in two or more counterparts,\neach of which will be deemed an original, but all of which taken together will\nconstitute one and the same instrument\n\n\ni. Survival. Any terms that by their nature survive termination or expiration\nof this Agreement shall survive.\n\n\n\n\n",
+                "text": "# Transaction Author Agreement V0.1\n\n\n## Summary:\n\n\nThis summary is provided to help you understand your obligations when writing to\nthe CANdy Ledger Networks-it does not have any legal effect or replace the full\nlegal text of the agreement provided below it.\n\n\n- This agreement grants you permission...",
                 "version": "0.1"
               },
               "type": "6",

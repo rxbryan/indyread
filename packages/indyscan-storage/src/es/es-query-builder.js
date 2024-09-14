@@ -110,6 +110,42 @@ function esMatchTxTime(utime) {
   }
 }
 
+function esMatchAuthRuleParams (auth_action, auth_type, field, new_value, old_value = null) {
+  const queries = [
+    {
+      match: {
+        "idata.expansion.idata.txn.data.auth_type": auth_type
+      }
+    },
+    {
+      match: {
+        "idata.expansion.idata.txn.data.field": field
+      }
+    },
+    {
+      match: {
+        "idata.expansion.idata.txn.data.auth_action": auth_action
+      }
+    },
+    {
+      match: {
+        "idata.expansion.idata.txn.data.new_value": new_value
+      }
+    }
+  ]
+
+  if (old_value) {
+    queries.push(
+      {
+        match: {
+          "idata.expansion.idata.txn.data.old_value": old_value
+        }
+      }
+    )
+  }
+  return { bool: { filter: [...queries] } }
+}
+
 function esFilterSubledgerName (subledgerName) {
   return {
     term: {
@@ -236,6 +272,7 @@ module.exports.esMatchTAAAVersion = esMatchTAAAVersion
 module.exports.esMatchTAADigest = esMatchTAADigest
 module.exports.esMatchRevocRegDefId = esMatchRevocRegDefId
 module.exports.esMatchTxTime = esMatchTxTime
+module.exports.esMatchAuthRuleParams = esMatchAuthRuleParams
 module.exports.esFilterTxnAfterTime = esFilterTxnAfterTime
 module.exports.esFilterTxnBeforeTime = esFilterTxnBeforeTime
 module.exports.esFilterBySeqNo = esFilterBySeqNo
