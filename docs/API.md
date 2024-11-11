@@ -50,7 +50,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Examples:**
         ```sh
-          curl "http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/100?ledgerId=1&reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb"
+          curl "http://0.0.0.0:3708/api/networks/TEST_NETWORK_2/txs/seqno/200?ledgerId=1&reqId=1235&identifier=121234"
         ```
     * **Response:**
         * **JSON:**
