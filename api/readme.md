@@ -6,6 +6,7 @@ ElasticSearch are expected to be in certain format.
 transaction formats are encapsuled in `daemon`.
 
 # Configuration
+## ENVIRONMENT 
 First you have to supply some environment variables. Example of variables and values:
 ```
 ES_URL=http://localhost:9200
@@ -23,13 +24,39 @@ Whereas
 - `LOG_HTTP_RESPONSES` - true/false - should outgoing http responses be logged 
 - `NETWORKS_CONFIG_PATH` - path to networks configuration file
 
-# Network configuration file
+## APP configuration file
 This configuration file specifies what networks will be available via API and which ES index they should be sourced
 from.
 For each network, you can set up it's human-friendly display name, network description and priority. The priority
 defines how will networks be ordered in API requests. The network with higher priority value will be first in the list.
 
-See sample config file [here](./app-config/sovrin.json) 
+See sample config file [here](./app-config/testnetwork.json)
+```json
+[
+  {
+    "id": "TEST_NETWORK",
+    "aliases": [
+      ""
+    ],
+    "es" : {
+      "index": "txs-bcovdev"
+    }
+  },
+  {
+    "id": "TEST_NETWORK_2",
+    "aliases": [
+      ""
+    ],
+    "es" : {
+      "index": "txs-candyprod"
+    }
+  } 
+]
+```
+- `id` - network id. 
+- `es.index` - elasticsearch index
+
+The `aliases` field can be ignored
 
 # Development
 1. Install dependencies `npm install`

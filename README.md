@@ -1,23 +1,59 @@
 # Indyread
 Read Replica for the Hyperledger Indy Ledger.
 
-Read replicas, in context of Hyperledger Indy, are copies of ledger transactions that are kept synchro-
-nized with the original Indy ledger. They are designed to offload read traffic from the main ledger,
-improving performance and scalability.
-This project focuses on improving the scalability of read transactions on Hyperledger Indy. These
-replicas store copies of ledger transactions and can be accessed by trusted entities (agents). Benefits
-include:
-- Reduces load on the main ledger for frequent read requests.
-- Offers a simpler API for retrieving data compared to the complex ZMQ interface for the main
-ledger.
-- Enables faster resolution of read transactions for agents.
+Hyperledger Indy "read replica” is a sort of observer node for Indy Network that holds copies of the ledger transactions and can be used by clients that “trust” the replica. 
+ 
+  - The use of read replicas will reduce the read load on the Indy ledgers it replicates. 
+  - Each replica stays up to date with the transactions on the ledgers it connects to.
+  - Agents using the replica need not connect directly with the ledger.
 
-### Usage
+  This project focuses on improving the scalability of read transactions on Hyperledger Indy. 
+
+  - Allows scaling of read transactions independent of the indy network. I.e support more clients.
+
+  - Makes it easy to onboard new developers to Indy. Using a REST interface for indy read allows any client that can make a http request to read from any Hyperledger Indy network.
+
+  - Solve network, port and firewall issues caused by reliance on ZMQ by the Indy network.
+
+## How it works?
+Indy read  consists of 
+  - a daemon that reads transactions from all three Indy ledgers (pool, config, domain), and stores them on an elasticsearch index.
+
+  - an API server that exposes endpoints analogous to the indy read requests. The server reads from the elasticsearch index.[Read more](./docs/API.md).
+
+  - Transactions are stored in Elasticsearch ([storage format info](./packages/indyscan-storage/readme.md))
+
+### Structure
+```
+- api/        - API for querying db-stored transactions
+- daemon/     - process searching for ledger transactions, storing them in a database
+- packages/indyscan-storage/    - shared library for app and daemon - how to store and retrieve transactions in db
+- packages/indyscan-txtype/     - shared library contaning domain knowledge about indy transactions
+```
+
+## Start test instance locally in localhost
+The easiest way to get started with indy read would be to use this [script](./manage). It starts an indy read instance and connects to the candy production netowrk.
+in order to reduce start up time,  the first 1523 transactions are read from [here](./start_test/esindex/txs-candyprod/) which at the time of writing is all the transactions in the candy production domain ledger.
+
+## for Custom deployments or running on host
+If
+- you want to deploy indy read replicas on your host machine
+- you want to deploy indy read replicas against some particular Indy network
+- you want to deploy indy read replicas on intranet
+
+First take a look at the individual services [here](./daemon/) and [here](./api/), you will find useful more info about the individual services you need and how to configure them.
+
+This [docker-compose](./docker-compose.es.yml) will startup an elasticsearch and kibana instance and this other [docker-compose](./docker-compose.prod.yml) will startup both the daemon and api services.
+you might just figure small modification you need to do for your use case.
+
+```sh
+docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml up -d
+```
+
+## Configuration
+
+
+## Usage
 You can find out how to Setup indyread for local tests [here](docs/setup_local_test_network.md)
 
-### API
-Provides replica clients with an HTTP version of the existing ledger API for querying and retrieving relevant identity data from the replicas. [Read more](docs/API.md).
-
-###  Daemon
-Scans ledger and stores the found transactions in an elasticsearch database.
 
