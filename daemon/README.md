@@ -63,7 +63,7 @@ set to `false`, you will have to enable workers either by calling server API or 
 ## Worker configuration
 The workers to be ran by daemon are specified by worker configuration files. Typically
 you won't need to write these but rather just slightly adjust ones that are provided to your 
-particular setup. 
+particular setup. You can find existing configurations [here](./app-configs/)
 
 Here's example of worker configuration file. 
 ```json

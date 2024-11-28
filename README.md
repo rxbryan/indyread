@@ -52,6 +52,8 @@ docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml up 
 
 ## Configuration
 
+See [Daemon](./api/readme.md) and [API server](./daemon/script/) for configuration information
+
 
 ## Usage
 You can find out how to Setup indyread for local tests [here](docs/setup_local_test_network.md)
