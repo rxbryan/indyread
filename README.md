@@ -1,7 +1,7 @@
-# Indyread
+# indy-read-replica
 Read Replica for the Hyperledger Indy Ledger.
 
-Hyperledger Indy "read replica” is a sort of observer node for Indy Network that holds copies of the ledger transactions and can be used by clients that “trust” the replica. 
+Hyperledger "indy read replica” is a sort of observer node for Indy Network that holds copies of the ledger transactions and can be used by clients that “trust” the replica. 
  
   - The use of read replicas will reduce the read load on the Indy ledgers it replicates. 
   - Each replica stays up to date with the transactions on the ledgers it connects to.

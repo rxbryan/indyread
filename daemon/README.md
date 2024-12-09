@@ -1,4 +1,4 @@
-# IndyRead Daemon
+# indy-read-replica-daemon
 In basic setup copies transactions from ledger into elasticsearch database and performs
 transformations on this data to make them easier to process.
 

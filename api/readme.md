@@ -1,4 +1,4 @@
-# IndyRead Replica
+# indy-read-Replica-api
 - Provides an API to get a Stringified JSON of the transaction data as was received from ledger.
 - Provides simple API to search and read transactions stored in ElasticSearch database. The transactions in 
 ElasticSearch are expected to be in certain format. 

@@ -8,7 +8,7 @@ async function run(url = "http://localhost:9200/", esindexes = ["txs-bcovdev", "
   for (let esindex of esindexes){
     const { importTxs } = await importIndex (esClient, esindex, path.join(
       path_str,
-      'start_test',
+      'start-test',
       'esindex',
       esindex
     ))

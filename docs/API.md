@@ -1,4 +1,4 @@
-### IndyRead API
+### indy-read-replica API
 
 **Description:**
 This API provides endpoints for querying the indy ledger.
@@ -15,10 +15,10 @@ This API provides endpoints for querying the indy ledger.
             ```json
                 [
                   {
-                    "id": "TEST_NETWORK",
+                    "id": "BCOVRIN_DEV",
                     "ui": {
                       "priority": 1,
-                      "display": "TEST_NETWORK",
+                      "display": "BCOVRIN_DEV",
                       "display-long": "",
                       "description": "For active development of indyread.",
                       "tutorial": "Get your DID and start writing on the network",
@@ -50,7 +50,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Examples:**
         ```sh
-          curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK_2/txs/seqno/200?ledgerId=1&reqId=1235&identifier=121234'
+          curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/seqno/100?ledgerId=1&reqId=1235&identifier=121234'
         ```
     * **Response:**
         * **JSON:**
@@ -136,7 +136,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-        curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/nym/YT1mzd8om41njS7VuoAwZ4/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
+        curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/nym/YT1mzd8om41njS7VuoAwZ4/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
         ```
     * **Response:**
         * **JSON:**
@@ -179,7 +179,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-        curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/attrib/RxFcjTjL6jPdn5EEJkNfqt?timestamp=1690575762&raw=eyJlbmRwb2ludCI6eyJlbmRwb2ludCI6Imh0dHA6Ly8xMC4xLjAuMTI6ODA0MCIsInJvdXRpbmdLZXlzIjpbXX19&reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
+        curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/attrib/RxFcjTjL6jPdn5EEJkNfqt?timestamp=1690575762&raw=eyJlbmRwb2ludCI6eyJlbmRwb2ludCI6Imh0dHA6Ly8xMC4xLjAuMTI6ODA0MCIsInJvdXRpbmdLZXlzIjpbXX19&reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
         ```
     * **Response:**
         * **JSON:**
@@ -216,7 +216,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-        curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/schema/AywStqzmPHG9uHfmL9e5AH?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&name=Schema_DriversLicense&version=1.0.1'
+        curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/schema/AywStqzmPHG9uHfmL9e5AH?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&name=Schema_DriversLicense&version=1.0.1'
         ```
     * **Response:**
         * **JSON:**
@@ -262,7 +262,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-          curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/claim-def/AywStqzmPHG9uHfmL9e5AH?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&ref=44&signature_type=CL&tag=Acme.agent.Schema_DriversLicense'
+          curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/claim-def/AywStqzmPHG9uHfmL9e5AH?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&ref=44&signature_type=CL&tag=Acme.agent.Schema_DriversLicense'
         ```
     * **Response:**
         * **JSON:**
@@ -313,7 +313,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-          curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg-def/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
+          curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/revoc-reg-def/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb'
         ```
     * **Response:**
         * **JSON:**
@@ -361,7 +361,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-          curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&timestamp=1690590788'
+          curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/revoc-reg/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&timestamp=1690590788'
         ```
     * **Response:**
         * **JSON:**
@@ -403,7 +403,7 @@ This API provides endpoints for querying the indy ledger.
         * `identifier`: (required)
     * **Example**
         ```sh
-          curl 'http://0.0.0.0:3708/api/networks/TEST_NETWORK/txs/revoc-reg-delta/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&from=1690593703&to=1690594373'
+          curl 'http://0.0.0.0:3708/api/networks/BCOVRIN_DEV/txs/revoc-reg-delta/GKQKQjdtRo5RC12RpHTC4P:4:GKQKQjdtRo5RC12RpHTC4P:3:CL:299:photo_id_revokable:CL_ACCUM:ef788d60-82d2-4076-ac74-3b8ebd46da68/?reqId=1514311352551755&identifier=MSjKTWkPLtYoPEaTF1TUDb&from=1690593703&to=1690594373'
         ```
     * **Response:**
         * **JSON:**

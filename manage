@@ -38,23 +38,26 @@ COMMAND=$(toLower ${1})
 
 case "${COMMAND}" in
   start)
-      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml up -d
+      docker compose -f docker-compose.es.yml -f docker-compose.prod.yml up -d
       echo "Waiting for elasticsearch..."
       sleep 15
-      node "start_test/import_esindex.js"
+      pushd start-test
+      npm install
+      popd
+      node "start-test/import_esindex.js"
       echo 'Want to see the scrolling container logs? Run "./manage logs"'
     ;;
   logs)
-      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml logs -f
+      docker compose -f docker-compose.es.yml -f docker-compose.prod.yml logs -f
     ;;
   stop)
-      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml down
+      docker compose -f docker-compose.es.yml -f docker-compose.prod.yml down
     ;;
   down|rm)
-      docker compose  -f docker-compose.es.yml -f start_test/docker-compose.dev.yml down --remove-orphans --volumes 
+      docker compose  -f docker-compose.es.yml -f docker-compose.prod.yml down --remove-orphans --volumes 
     ;;
   build)
-      docker compose -f docker-compose.es.yml -f start_test/docker-compose.dev.yml build
+      docker compose -f docker-compose.es.yml -f docker-compose.prod.yml build
     ;;
   rebuild)
       echo "Not implemented"
